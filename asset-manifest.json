@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.css": "/BernensAuto/static/css/main.622b6ead.css",
-    "main.js": "/BernensAuto/static/js/main.05c941d4.js",
-    "index.html": "/BernensAuto/index.html",
-    "main.622b6ead.css.map": "/BernensAuto/static/css/main.622b6ead.css.map",
-    "main.05c941d4.js.map": "/BernensAuto/static/js/main.05c941d4.js.map"
+    "main.css": "/BernansAuto/static/css/main.622b6ead.css",
+    "main.js": "/BernansAuto/static/js/main.05c941d4.js",
+    "index.html": "/BernansAuto/index.html",
+    "main.622b6ead.css.map": "/BernansAuto/static/css/main.622b6ead.css.map",
+    "main.05c941d4.js.map": "/BernansAuto/static/js/main.05c941d4.js.map"
   },
   "entrypoints": [
     "static/css/main.622b6ead.css",
