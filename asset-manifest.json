@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/BernensAuto/static/css/main.622b6ead.css",
+    "main.js": "/BernensAuto/static/js/main.05c941d4.js",
+    "index.html": "/BernensAuto/index.html",
+    "main.622b6ead.css.map": "/BernensAuto/static/css/main.622b6ead.css.map",
+    "main.05c941d4.js.map": "/BernensAuto/static/js/main.05c941d4.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.622b6ead.css",
+    "static/js/main.05c941d4.js"
+  ]
+}
