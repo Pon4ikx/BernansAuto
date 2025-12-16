@@ -72,8 +72,12 @@ WSGI_APPLICATION = 'bernansauto.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'BernansAuto_DATABASE',  # Название базы
+        'USER': 'postgres',  # Имя пользователя
+        'PASSWORD': 'postgres',  # Пароль пользователя
+        'HOST': '26.134.120.32',
+        'PORT': '5432',
     }
 }
 
@@ -96,6 +100,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+AUTH_USER_MODEL = 'accounts.User'
+
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
@@ -117,6 +125,11 @@ USE_I18N = True
 
 USE_TZ = True
 
+# ADMIN_SITE_HEADER = "Администрирование"
+# ADMIN_SITE_TITLE = "Администрирование"
+#
+# ADMIN_INTERFACE_HIDE_THEMES = True
+# GRAPPELLI_SWITCH_THEME = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
