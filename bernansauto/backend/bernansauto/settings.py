@@ -125,11 +125,11 @@ USE_I18N = True
 
 USE_TZ = True
 
-ADMIN_SITE_HEADER = "Администрирование"
-ADMIN_SITE_TITLE = "Администрирование"
-
-ADMIN_INTERFACE_HIDE_THEMES = True
-GRAPPELLI_SWITCH_THEME = False
+# ADMIN_SITE_HEADER = "Администрирование"
+# ADMIN_SITE_TITLE = "Администрирование"
+#
+# ADMIN_INTERFACE_HIDE_THEMES = True
+# GRAPPELLI_SWITCH_THEME = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
