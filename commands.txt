@@ -1,0 +1,14 @@
+Выход на уровень выше
+    cd ..
+запуск backend (Django)
+    cd .\bernansauto\backend
+    python manage.py runserver
+заупск  frontend (React)
+    cd .\bernansauto\frontend\
+    npm start
+
+Работа с Git
+    проверка не закинутых файлов
+    git status 
+    Добавить файл в индекс
+    git add "Файл и путь к нему"
