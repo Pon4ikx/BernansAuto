@@ -76,7 +76,7 @@ DATABASES = {
         'NAME': 'BernansAuto_DATABASE',  # Название базы
         'USER': 'postgres',  # Имя пользователя
         'PASSWORD': 'postgres',  # Пароль пользователя
-        'HOST': '26.134.120.32',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
@@ -135,6 +135,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
