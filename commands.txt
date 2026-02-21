@@ -3,7 +3,7 @@
 запуск backend (Django)
     cd .\bernansauto\backend
     python manage.py runserver
-заупск  frontend (React)
+запуск  frontend (React)
     cd .\bernansauto\frontend\
     npm start
 
@@ -12,7 +12,3 @@
     git status 
     Добавить файл в индекс
     git add "Файл и путь к нему"
-
-
-
-    выапывапывапвы
