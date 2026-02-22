@@ -7,11 +7,16 @@ class Car(models.Model):
     marka = models.CharField(max_length=100, verbose_name="Марка", default="")
     car_model = models.CharField(max_length=100, verbose_name="Модель", default="")
     year = models.PositiveIntegerField(verbose_name="Год выпуска", default=2000)
-    mileage = models.PositiveIntegerField(verbose_name="Пробег", default=0)
     body_type = models.CharField(max_length=50, blank=True, verbose_name="Тип кузова")
-    engine_type = models.CharField(max_length=50, blank=True, verbose_name="Тип двигателя")
+    mileage = models.PositiveIntegerField(verbose_name="Пробег", default=0)
     transmission = models.CharField(max_length=50, blank=True, verbose_name="Коробка передач")
     drive_type = models.CharField(max_length=50, blank=True, verbose_name="Привод")
+    engine_type = models.CharField(max_length=50, blank=True, verbose_name="Тип двигателя")
+    engine_volume = models.DecimalField(
+        max_digits=6, decimal_places=2, null=True, blank=True, verbose_name="Объём двигателя"
+    )
+    color = models.CharField(max_length=50, blank=True, verbose_name="Цвет")
+    
     price_byn = models.DecimalField(
         max_digits=12, decimal_places=2, null=True, blank=True, verbose_name="Цена BYN"
     )
@@ -75,7 +80,7 @@ class Car_Photo(models.Model):
     car = models.ForeignKey(
         Car, on_delete=models.CASCADE, related_name="photos", verbose_name="Автомобиль"
     )
-    link = models.CharField(max_length=500, verbose_name="Ссылка на фото")
+    photo = models.ImageField(upload_to='cars/photos/', blank=True, null=True, verbose_name="Фото")
 
     class Meta:
         db_table = "cars_car_photo"
@@ -92,7 +97,7 @@ class Moto_Photo(models.Model):
     motorcycle = models.ForeignKey(
         Motorcycle, on_delete=models.CASCADE, related_name="photos", verbose_name="Мототехника"
     )
-    link = models.CharField(max_length=500, verbose_name="Ссылка на фото")
+    photo = models.ImageField(upload_to='motorcycles/photos/', blank=True, null=True, verbose_name="Фото")
 
     class Meta:
         db_table = "cars_moto_photo"

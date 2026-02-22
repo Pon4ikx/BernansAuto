@@ -5,6 +5,9 @@ const MainPage = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [currencyRate, setCurrencyRate] = useState(2.5); // Пример курса BYN/USD
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    // Панель входа/регистрации: открыта ли панель и какая вкладка активна
+    const [isAuthPanelOpen, setIsAuthPanelOpen] = useState(false);
+    const [authTab, setAuthTab] = useState('login'); // 'login' | 'register'
 
     // Данные для слайдера
     const slides = [
@@ -59,6 +62,13 @@ const MainPage = () => {
         }
     ];
 
+    // Популярная мототехника (как блок «Подбор мототехники» на Golden Motors)
+    const featuredMotos = [
+        { id: 1, image: 'https://via.placeholder.com/300x200.png?text=Moto+1', brand: 'Honda', model: 'CMX', year: 2023, mileage: 5500, price: 8800 },
+        { id: 2, image: 'https://via.placeholder.com/300x200.png?text=Moto+2', brand: 'Suzuki', model: 'Boulevard C50', year: 2008, mileage: 13000, price: 5950 },
+        { id: 3, image: 'https://via.placeholder.com/300x200.png?text=Moto+3', brand: 'Harley-Davidson', model: 'Road Glide', year: 2019, mileage: 53600, price: 16950 }
+    ];
+
     // Услуги
     const services = [
         { icon: '🚗', title: 'Продажа авто', description: 'Широкий выбор новых и подержанных автомобилей' },
@@ -101,7 +111,7 @@ const MainPage = () => {
                             <a href="#services">Услуги</a>
                             <a href="#news">Новости</a>
                             <a href="#contacts">Контакты</a>
-                            <a href="/login" className="login-btn">Войти</a>
+                            <button type="button" className="login-btn" onClick={() => { setIsAuthPanelOpen(true); setAuthTab('login'); }}>Войти</button>
                         </nav>
 
                         <button
@@ -115,6 +125,45 @@ const MainPage = () => {
                     </div>
                 </div>
             </header>
+
+            {/* Оверлей и панель входа/регистрации (выезжает справа по кнопке «Войти») */}
+            <div className={`auth-overlay ${isAuthPanelOpen ? 'open' : ''}`} onClick={() => setIsAuthPanelOpen(false)} aria-hidden="true" />
+            <div className={`auth-panel ${isAuthPanelOpen ? 'open' : ''}`}>
+                <div className="auth-panel-header">
+                    <h2>Вход в аккаунт</h2>
+                    <button type="button" className="auth-panel-close" onClick={() => setIsAuthPanelOpen(false)} aria-label="Закрыть">×</button>
+                </div>
+                <div className="auth-tabs">
+                    <button type="button" className={`auth-tab ${authTab === 'login' ? 'active' : ''}`} onClick={() => setAuthTab('login')}>Вход</button>
+                    <button type="button" className={`auth-tab ${authTab === 'register' ? 'active' : ''}`} onClick={() => setAuthTab('register')}>Регистрация</button>
+                </div>
+                <div className="auth-panel-body">
+                    {authTab === 'login' && (
+                        <form className="auth-form" onSubmit={(e) => e.preventDefault()}>
+                            <label htmlFor="auth-email">Email</label>
+                            <input id="auth-email" type="email" placeholder="example@mail.com" autoComplete="email" />
+                            <label htmlFor="auth-password">Пароль</label>
+                            <input id="auth-password" type="password" placeholder="••••••••" autoComplete="current-password" />
+                            <button type="submit" className="btn-primary">Войти</button>
+                        </form>
+                    )}
+                    {authTab === 'register' && (
+                        <form className="auth-form" onSubmit={(e) => e.preventDefault()}>
+                            <label htmlFor="reg-username">Имя пользователя</label>
+                            <input id="reg-username" type="text" placeholder="Имя пользователя" autoComplete="username" />
+                            <label htmlFor="reg-phone">Телефон</label>
+                            <input id="reg-phone" type="tel" placeholder="+375 (29) 123-45-67" autoComplete="tel" />
+                            <label htmlFor="reg-email">Email</label>
+                            <input id="reg-email" type="email" placeholder="example@mail.com" autoComplete="email" />
+                            <label htmlFor="reg-password">Пароль</label>
+                            <input id="reg-password" type="password" placeholder="••••••••" autoComplete="new-password" />
+                            <label htmlFor="reg-password2">Повторите пароль</label>
+                            <input id="reg-password2" type="password" placeholder="••••••••" autoComplete="new-password" />
+                            <button type="submit" className="btn-primary">Зарегистрироваться</button>
+                        </form>
+                    )}
+                </div>
+            </div>
 
             {/* Hero Slider */}
             <section className="hero-slider">
@@ -149,39 +198,45 @@ const MainPage = () => {
                 </div>
             </section>
 
-            {/* Quick Search */}
+            {/* Подбор автомобилей (как на Golden Motors) */}
             <section className="quick-search">
                 <div className="container">
-                    <h2>Быстрый поиск автомобиля</h2>
+                    <h2>Подбор автомобилей</h2>
                     <div className="search-filters">
-                        <select>
-                            <option>Марка</option>
-                            <option>BMW</option>
-                            <option>Mercedes</option>
-                            <option>Audi</option>
-                        </select>
-                        <select>
-                            <option>Модель</option>
-                        </select>
-                        <select>
-                            <option>Год от</option>
-                            <option>2020</option>
-                            <option>2021</option>
-                            <option>2022</option>
-                            <option>2023</option>
-                        </select>
-                        <select>
-                            <option>Цена до</option>
-                            <option>50,000</option>
-                            <option>100,000</option>
-                            <option>150,000</option>
-                        </select>
-                        <button className="btn-primary">Найти</button>
+                        <div className="search-filters-fields">
+                            <select>
+                                <option>Цена авто $ от</option>
+                                <option>5 000</option>
+                                <option>10 000</option>
+                                <option>20 000</option>
+                                <option>50 000</option>
+                            </select>
+                            <select>
+                                <option>до</option>
+                                <option>20 000</option>
+                                <option>50 000</option>
+                                <option>100 000</option>
+                                <option>150 000</option>
+                            </select>
+                            <select>
+                                <option>Марка авто</option>
+                                <option>BMW</option>
+                                <option>Mercedes-Benz</option>
+                                <option>Audi</option>
+                                <option>Volkswagen</option>
+                            </select>
+                            <select>
+                                <option>Модель авто</option>
+                            </select>
+                        </div>
+                        <div className="search-filters-submit">
+                            <button type="button" className="btn-primary">Показать авто</button>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            {/* Featured Cars */}
+            {/* Автомобили — блок каталога */}
             <section id="cars" className="featured-cars">
                 <div className="container">
                     <h2>Популярные автомобили</h2>
@@ -212,15 +267,50 @@ const MainPage = () => {
                         })}
                     </div>
                     <div className="section-footer">
-                        <button className="btn-primary">Смотреть все автомобили</button>
+                        <button className="btn-primary">Перейти в каталог</button>
                     </div>
                 </div>
             </section>
 
-            {/* Services */}
+            {/* Мототехника — второй блок как на Golden Motors */}
+            <section id="motorcycles" className="featured-motos">
+                <div className="container">
+                    <h2>Подбор мототехники</h2>
+                    <div className="motos-grid">
+                        {featuredMotos.map(moto => {
+                            const price = formatPrice(moto.price);
+                            return (
+                                <div key={moto.id} className="moto-card">
+                                    <div className="moto-image">
+                                        <img src={moto.image} alt={`${moto.brand} ${moto.model}`} />
+                                        <div className="moto-badge">В наличии</div>
+                                    </div>
+                                    <div className="moto-info">
+                                        <h3>{moto.brand} {moto.model}</h3>
+                                        <div className="moto-details">
+                                            <span>{moto.year} г.</span>
+                                            <span>{moto.mileage.toLocaleString()} км</span>
+                                        </div>
+                                        <div className="moto-price">
+                                            <div className="price-byn">{price.byn}</div>
+                                            <div className="price-usd">{price.usd}</div>
+                                        </div>
+                                        <button className="btn-outline">Подробнее</button>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                    <div className="section-footer">
+                        <button className="btn-primary">Перейти в каталог</button>
+                    </div>
+                </div>
+            </section>
+
+            {/* Услуги — «Что мы предлагаем» в стиле Golden Motors */}
             <section id="services" className="services">
                 <div className="container">
-                    <h2>Наши услуги</h2>
+                    <h2>Что мы предлагаем</h2>
                     <div className="services-grid">
                         {services.map((service, index) => (
                             <div key={index} className="service-card">
@@ -233,12 +323,12 @@ const MainPage = () => {
                 </div>
             </section>
 
-            {/* CTA Section */}
+            {/* Призыв к действию (выкуп / комиссия) */}
             <section className="cta-section">
                 <div className="container">
                     <div className="cta-content">
-                        <h2>Хотите продать свой автомобиль?</h2>
-                        <p>Получите бесплатную оценку вашего автомобиля онлайн</p>
+                        <h2>Хотите продать автомобиль или мотоцикл?</h2>
+                        <p>Выкуп до 90% рыночной цены, комиссионная продажа и Trade-in. Деньги сразу.</p>
                         <div className="cta-buttons">
                             <button className="btn-primary">Быстрая оценка</button>
                             <button className="btn-secondary">Комиссионная продажа</button>
