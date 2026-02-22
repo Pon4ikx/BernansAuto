@@ -1,27 +1,24 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from .models import Car, Motorcycle, Car_Photo, Moto_Photo, Favorite
 
-
-class Car_PhotoInline(admin.TabularInline):
-    model = Car_Photo
-    extra = 0
-    fields = ("car", "link")
 
 
 class Moto_PhotoInline(admin.TabularInline):
     model = Moto_Photo
     extra = 0
-    fields = ("motorcycle", "link")
+    fields = ("photo",)
 
 
 @admin.register(Car)
 class CarAdmin(admin.ModelAdmin):
     list_display = (
-        "id",
         "marka",
         "car_model",
         "year",
         "mileage",
+        "engine_volume",
+        "color",
         "price_byn",
         "price_usd",
         "available",
@@ -31,10 +28,9 @@ class CarAdmin(admin.ModelAdmin):
     search_fields = ("marka", "car_model", "description")
     list_editable = ("available",)
     readonly_fields = ("created_at", "updated_at")
-    inlines = [Car_PhotoInline]
     fieldsets = (
-        (None, {"fields": ("marka", "car_model", "year", "mileage", "description", "available")}),
-        ("Двигатель и ходовая", {"fields": ("body_type", "engine_type", "transmission", "drive_type")}),
+        (None, {"fields": ("marka", "car_model", "year", "mileage", "color", "description", "available")}),
+        ("Двигатель и ходовая", {"fields": ("body_type", "engine_type", "engine_volume", "transmission", "drive_type")}),
         ("Цены", {"fields": ("price_byn", "price_usd")}),
         ("Даты", {"fields": ("created_at", "updated_at")}),
     )
@@ -69,18 +65,48 @@ class MotorcycleAdmin(admin.ModelAdmin):
 
 @admin.register(Car_Photo)
 class Car_PhotoAdmin(admin.ModelAdmin):
-    list_display = ("id", "car", "link")
+    list_display = ("car", "photo_thumb", "photo")
     list_filter = ("car",)
-    search_fields = ("car__marka", "car__car_model", "link")
+    search_fields = ("car__marka", "car__car_model")
     raw_id_fields = ("car",)
+    readonly_fields = ("photo_thumb",)
+
+    def photo_thumb(self, obj):
+        if obj.pk and obj.photo:
+            return format_html(
+                '<img src="{}" style="max-height: 100px; max-width: 150px; object-fit: contain;" />',
+                obj.photo.url,
+            )
+        return "—"
+    photo_thumb.short_description = "Превью"
+
+    def get_fieldsets(self, request, obj=None):
+        if obj and obj.photo:
+            return [(None, {"fields": ("car", "photo_thumb", "photo")})]
+        return [(None, {"fields": ("car", "photo")})]
 
 
 @admin.register(Moto_Photo)
 class Moto_PhotoAdmin(admin.ModelAdmin):
-    list_display = ("id", "motorcycle", "link")
+    list_display = ("id", "motorcycle", "photo_thumb", "photo")
     list_filter = ("motorcycle",)
-    search_fields = ("motorcycle__marka", "motorcycle__moto_model", "link")
+    search_fields = ("motorcycle__marka", "motorcycle__moto_model")
     raw_id_fields = ("motorcycle",)
+    readonly_fields = ("photo_thumb",)
+
+    def photo_thumb(self, obj):
+        if obj.pk and obj.photo:
+            return format_html(
+                '<img src="{}" style="max-height: 100px; max-width: 150px; object-fit: contain;" />',
+                obj.photo.url,
+            )
+        return "—"
+    photo_thumb.short_description = "Превью"
+
+    def get_fieldsets(self, request, obj=None):
+        if obj and obj.photo:
+            return [(None, {"fields": ("motorcycle", "photo_thumb", "photo")})]
+        return [(None, {"fields": ("motorcycle", "photo")})]
 
 
 @admin.register(Favorite)
