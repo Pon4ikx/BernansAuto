@@ -1,0 +1,269 @@
+.cars-page {
+  min-height: 100vh;
+  background: var(--color-bg-light);
+}
+
+/* NavLink на активной странице */
+.nav-link.active {
+  color: var(--color-accent) !important;
+}
+
+.catalog-main {
+  padding-top: 72px; /* высота фиксированного хедера */
+}
+
+.catalog-hero {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+  color: #fff;
+  padding: 2.25rem 0;
+}
+
+.catalog-hero h2 {
+  font-size: 2rem;
+  margin-bottom: 0.25rem;
+}
+
+.catalog-hero p {
+  opacity: 0.95;
+}
+
+.breadcrumbs {
+  background: #fff;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.breadcrumbs-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 0;
+  font-size: 0.95rem;
+}
+
+.breadcrumbs-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.breadcrumbs-link:hover {
+  text-decoration: underline;
+}
+
+.breadcrumbs-sep {
+  color: #777;
+}
+
+.breadcrumbs-current {
+  color: #333;
+  font-weight: 600;
+}
+
+.catalog-filters {
+  padding: 2rem 0;
+}
+
+.filters-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  padding: 1.25rem;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+  align-items: end;
+}
+
+.filter-field {
+  grid-column: span 3;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.filter-field label {
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 600;
+}
+
+.filter-field input,
+.filter-field select {
+  padding: 12px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--color-bg-light);
+}
+
+.filter-field input:focus,
+.filter-field select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.filter-field-checkbox {
+  grid-column: span 3;
+}
+
+.filter-field-checkbox label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  user-select: none;
+}
+
+.filters-actions {
+  grid-column: span 3;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.catalog-results {
+  padding: 0 0 4rem;
+}
+
+.results-header {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  justify-content: space-between;
+  margin: 0.5rem 0 1.25rem;
+}
+
+.results-header h3 {
+  color: var(--color-primary);
+  font-size: 1.1rem;
+}
+
+.results-muted {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.results-error {
+  color: #b00020;
+  font-size: 0.95rem;
+  margin-left: auto;
+}
+
+.results-empty {
+  background: #fff;
+  border: 1px dashed var(--color-border);
+  border-radius: 12px;
+  padding: 2rem;
+  color: #555;
+  text-align: center;
+  grid-column: 1 / -1;
+}
+
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.catalog-card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.catalog-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 22px rgba(25, 149, 173, 0.12);
+}
+
+.catalog-card-image {
+  position: relative;
+  height: 200px;
+  background: var(--color-bg-light);
+}
+
+.catalog-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.catalog-card-placeholder {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #666;
+  font-weight: 600;
+}
+
+.catalog-card-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: var(--color-accent);
+  color: #333;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.catalog-card-body {
+  padding: 1.15rem 1.25rem 1.25rem;
+}
+
+.catalog-card-body h4 {
+  margin: 0 0 0.6rem;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.catalog-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.75rem;
+  color: #555;
+  font-size: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.catalog-card-price {
+  margin-bottom: 0.9rem;
+}
+
+@media (max-width: 1100px) {
+  .filter-field,
+  .filters-actions,
+  .filter-field-checkbox {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 768px) {
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-field,
+  .filters-actions,
+  .filter-field-checkbox {
+    grid-column: auto;
+  }
+
+  .filters-actions {
+    justify-content: stretch;
+    flex-direction: column;
+  }
+
+  .filters-actions .btn-primary,
+  .filters-actions .btn-outline {
+    width: 100%;
+  }
+}
+

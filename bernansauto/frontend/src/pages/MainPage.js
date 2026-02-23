@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import SiteHeader from '../components/SiteHeader';
 import '../styles/MainPage.css';
 
 const MainPage = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [currencyRate, setCurrencyRate] = useState(2.5); // Пример курса BYN/USD
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    // Панель входа/регистрации: открыта ли панель и какая вкладка активна
-    const [isAuthPanelOpen, setIsAuthPanelOpen] = useState(false);
-    const [authTab, setAuthTab] = useState('login'); // 'login' | 'register'
+    const location = useLocation();
 
     // Данные для слайдера
     const slides = [
@@ -84,6 +83,19 @@ const MainPage = () => {
         return () => clearInterval(interval);
     }, [slides.length]);
 
+    // Если перешли на главную по ссылке вида "/#services" — аккуратно скроллим к секции.
+    useEffect(() => {
+        if (!location.hash) return;
+        const id = location.hash.replace('#', '');
+        if (!id) return;
+        // небольшой таймаут, чтобы DOM успел отрисоваться
+        const t = setTimeout(() => {
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
+        return () => clearTimeout(t);
+    }, [location.hash]);
+
     const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
     const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
@@ -97,73 +109,7 @@ const MainPage = () => {
 
     return (
         <div className="main-page">
-            {/* Header */}
-            <header className="header">
-                <div className="container">
-                    <div className="header-content">
-                        <div className="logo">
-                            <h1>Bernans Auto</h1>
-                        </div>
-
-                        <nav className={`nav ${isMenuOpen ? 'nav-open' : ''}`}>
-                            <a href="#cars">Автомобили</a>
-                            <a href="#motorcycles">Мототехника</a>
-                            <a href="#services">Услуги</a>
-                            <a href="#news">Новости</a>
-                            <a href="#contacts">Контакты</a>
-                            <button type="button" className="login-btn" onClick={() => { setIsAuthPanelOpen(true); setAuthTab('login'); }}>Войти</button>
-                        </nav>
-
-                        <button
-                            className="menu-toggle"
-                            onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        >
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            {/* Оверлей и панель входа/регистрации (выезжает справа по кнопке «Войти») */}
-            <div className={`auth-overlay ${isAuthPanelOpen ? 'open' : ''}`} onClick={() => setIsAuthPanelOpen(false)} aria-hidden="true" />
-            <div className={`auth-panel ${isAuthPanelOpen ? 'open' : ''}`}>
-                <div className="auth-panel-header">
-                    <h2>Вход в аккаунт</h2>
-                    <button type="button" className="auth-panel-close" onClick={() => setIsAuthPanelOpen(false)} aria-label="Закрыть">×</button>
-                </div>
-                <div className="auth-tabs">
-                    <button type="button" className={`auth-tab ${authTab === 'login' ? 'active' : ''}`} onClick={() => setAuthTab('login')}>Вход</button>
-                    <button type="button" className={`auth-tab ${authTab === 'register' ? 'active' : ''}`} onClick={() => setAuthTab('register')}>Регистрация</button>
-                </div>
-                <div className="auth-panel-body">
-                    {authTab === 'login' && (
-                        <form className="auth-form" onSubmit={(e) => e.preventDefault()}>
-                            <label htmlFor="auth-email">Email</label>
-                            <input id="auth-email" type="email" placeholder="example@mail.com" autoComplete="email" />
-                            <label htmlFor="auth-password">Пароль</label>
-                            <input id="auth-password" type="password" placeholder="••••••••" autoComplete="current-password" />
-                            <button type="submit" className="btn-primary">Войти</button>
-                        </form>
-                    )}
-                    {authTab === 'register' && (
-                        <form className="auth-form" onSubmit={(e) => e.preventDefault()}>
-                            <label htmlFor="reg-username">Имя пользователя</label>
-                            <input id="reg-username" type="text" placeholder="Имя пользователя" autoComplete="username" />
-                            <label htmlFor="reg-phone">Телефон</label>
-                            <input id="reg-phone" type="tel" placeholder="+375 (29) 123-45-67" autoComplete="tel" />
-                            <label htmlFor="reg-email">Email</label>
-                            <input id="reg-email" type="email" placeholder="example@mail.com" autoComplete="email" />
-                            <label htmlFor="reg-password">Пароль</label>
-                            <input id="reg-password" type="password" placeholder="••••••••" autoComplete="new-password" />
-                            <label htmlFor="reg-password2">Повторите пароль</label>
-                            <input id="reg-password2" type="password" placeholder="••••••••" autoComplete="new-password" />
-                            <button type="submit" className="btn-primary">Зарегистрироваться</button>
-                        </form>
-                    )}
-                </div>
-            </div>
+            <SiteHeader />
 
             {/* Hero Slider */}
             <section className="hero-slider">
@@ -177,7 +123,7 @@ const MainPage = () => {
                             <h2>{slide.title}</h2>
                             <p>{slide.subtitle}</p>
                             <div className="slider-buttons">
-                                <button className="btn-primary">Посмотреть каталог</button>
+                                <Link to="/cars" className="btn-primary">Посмотреть каталог</Link>
                                 <button className="btn-secondary">Оставить заявку</button>
                             </div>
                         </div>
@@ -267,7 +213,7 @@ const MainPage = () => {
                         })}
                     </div>
                     <div className="section-footer">
-                        <button className="btn-primary">Перейти в каталог</button>
+                        <Link to="/cars" className="btn-primary">Перейти в каталог</Link>
                     </div>
                 </div>
             </section>
@@ -302,7 +248,7 @@ const MainPage = () => {
                         })}
                     </div>
                     <div className="section-footer">
-                        <button className="btn-primary">Перейти в каталог</button>
+                        <Link to="/cars" className="btn-primary">Перейти в каталог</Link>
                     </div>
                 </div>
             </section>
@@ -323,6 +269,20 @@ const MainPage = () => {
                 </div>
             </section>
 
+            {/* Новости (якорь для ссылки из хедера) */}
+            <section id="news" className="services">
+                <div className="container">
+                    <h2>Новости</h2>
+                    <div className="services-grid">
+                        <div className="service-card">
+                            <div className="service-icon">📰</div>
+                            <h3>Скоро здесь будут новости</h3>
+                            <p>На этом блоке будем показывать последние публикации/обновления из бэкенда.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Призыв к действию (выкуп / комиссия) */}
             <section className="cta-section">
                 <div className="container">
@@ -338,7 +298,7 @@ const MainPage = () => {
             </section>
 
             {/* Footer */}
-            <footer className="footer">
+            <footer id="contacts" className="footer">
                 <div className="container">
                     <div className="footer-content">
                         <div className="footer-section">

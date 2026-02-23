@@ -69,7 +69,22 @@ body {
     transition: color 0.2s;
 }
 
+.nav .nav-link {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
 .nav a:hover {
+    color: var(--color-accent);
+}
+
+.nav .nav-link:hover {
+    color: var(--color-accent);
+}
+
+.nav .nav-link.active {
     color: var(--color-accent);
 }
 
@@ -230,6 +245,8 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .btn-primary:hover {
@@ -246,6 +263,8 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s, color 0.2s;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .btn-secondary:hover {
@@ -262,6 +281,8 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .btn-outline:hover {
