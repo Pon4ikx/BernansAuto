@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.html import format_html
 from .models import Car, Motorcycle, Car_Photo, Moto_Photo, Favorite
 
@@ -39,11 +41,12 @@ class CarAdmin(admin.ModelAdmin):
 @admin.register(Motorcycle)
 class MotorcycleAdmin(admin.ModelAdmin):
     list_display = (
-        "id",
         "marka",
         "moto_model",
         "year",
         "mileage",
+        "transmission",
+        "engine_type",
         "engine_volume",
         "moto_type",
         "price_byn",
@@ -57,7 +60,7 @@ class MotorcycleAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at",)
     inlines = [Moto_PhotoInline]
     fieldsets = (
-        (None, {"fields": ("marka", "moto_model", "year", "mileage", "engine_volume", "moto_type", "description", "available")}),
+        (None, {"fields": ("marka", "moto_model", "year", "mileage", "transmission", "engine_type", "engine_volume", "moto_type", "description", "available")}),
         ("Цены", {"fields": ("price_byn", "price_usd")}),
         ("Даты", {"fields": ("created_at",)}),
     )
@@ -85,10 +88,33 @@ class Car_PhotoAdmin(admin.ModelAdmin):
             return [(None, {"fields": ("car", "photo_thumb", "photo")})]
         return [(None, {"fields": ("car", "photo")})]
 
+    def get_changeform_initial_data(self, request):
+        """
+        Если в querystring передан ?car=<id>, подставляем этот автомобиль по умолчанию.
+        Это нужно, чтобы при добавлении нескольких фотографий подряд не приходилось
+        каждый раз заново выбирать машину.
+        """
+        initial = super().get_changeform_initial_data(request)
+        car_id = request.GET.get("car")
+        if car_id:
+            initial["car"] = car_id
+        return initial
+
+    def response_add(self, request, obj, post_url_continue=None):
+        """
+        При нажатии «Сохранить и добавить ещё» остаёмся в форме добавления фото
+        с тем же самым автомобилем, который только что выбрали.
+        """
+        if "_addanother" in request.POST:
+            opts = self.model._meta
+            add_url = reverse(f"admin:{opts.app_label}_{opts.model_name}_add")
+            return HttpResponseRedirect(f"{add_url}?car={obj.car_id}")
+        return super().response_add(request, obj, post_url_continue)
+
 
 @admin.register(Moto_Photo)
 class Moto_PhotoAdmin(admin.ModelAdmin):
-    list_display = ("id", "motorcycle", "photo_thumb", "photo")
+    list_display = ( "motorcycle", "photo_thumb", "photo")
     list_filter = ("motorcycle",)
     search_fields = ("motorcycle__marka", "motorcycle__moto_model")
     raw_id_fields = ("motorcycle",)
@@ -107,6 +133,26 @@ class Moto_PhotoAdmin(admin.ModelAdmin):
         if obj and obj.photo:
             return [(None, {"fields": ("motorcycle", "photo_thumb", "photo")})]
         return [(None, {"fields": ("motorcycle", "photo")})]
+
+    def get_changeform_initial_data(self, request):
+        """
+        Аналогично Car_PhotoAdmin: подставляем выбранную мототехнику из ?motorcycle=<id>.
+        """
+        initial = super().get_changeform_initial_data(request)
+        moto_id = request.GET.get("motorcycle")
+        if moto_id:
+            initial["motorcycle"] = moto_id
+        return initial
+
+    def response_add(self, request, obj, post_url_continue=None):
+        """
+        «Сохранить и добавить ещё» оставляет выбранную мототехнику.
+        """
+        if "_addanother" in request.POST:
+            opts = self.model._meta
+            add_url = reverse(f"admin:{opts.app_label}_{opts.model_name}_add")
+            return HttpResponseRedirect(f"{add_url}?motorcycle={obj.motorcycle_id}")
+        return super().response_add(request, obj, post_url_continue)
 
 
 @admin.register(Favorite)

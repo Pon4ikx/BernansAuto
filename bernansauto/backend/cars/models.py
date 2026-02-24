@@ -44,11 +44,15 @@ class Motorcycle(models.Model):
         ("мотоцикл", "Мотоцикл"),
         ("квадроцикл", "Квадроцикл"),
         ("скутер", "Скутер"),
+        ("седан", "Седан"),
     ]
     marka = models.CharField(max_length=100, verbose_name="Марка", default="")
     moto_model = models.CharField(max_length=100, verbose_name="Модель", default="")
     year = models.PositiveIntegerField(verbose_name="Год выпуска", default=2000)
     mileage = models.PositiveIntegerField(verbose_name="Пробег", default=0)
+    transmission = models.CharField(max_length=50, blank=True, verbose_name="Привод")
+    engine_type = models.CharField(max_length=50, blank=True, verbose_name="Двигатель")
+
     engine_volume = models.DecimalField(
         max_digits=6, decimal_places=2, null=True, blank=True, verbose_name="Объём двигателя"
     )

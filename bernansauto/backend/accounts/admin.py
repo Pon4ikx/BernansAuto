@@ -13,6 +13,8 @@ class CustomUserAdmin(UserAdmin):
     model = User
     list_display = ('id', 'username', 'email', 'phone', 'date_registered', 'is_staff')
     list_filter = ('is_staff', 'is_superuser', 'is_active')
+    # date_registered создаётся автоматически (auto_now_add), поэтому в форме делаем его только для чтения
+    readonly_fields = ('date_registered',)
 
     fieldsets = (
         (None, {'fields': ('username', 'email', 'phone', 'password')}),
