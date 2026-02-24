@@ -17,7 +17,12 @@ export default function SiteHeader() {
         <div className="container">
           <div className="header-content">
             <div className="logo">
-              <h1>Bernans Auto</h1>
+              <Link to="/" className="logo-link">
+                <span className="logo-inner">
+                  <img src={process.env.PUBLIC_URL + '/icon.png'} alt="Bernans Auto" className="logo-icon" />
+                  <span className="logo-text">Bernans Auto</span>
+                </span>
+              </Link>
             </div>
 
             <nav className={`nav ${isMenuOpen ? 'nav-open' : ''}`}>
@@ -31,6 +36,14 @@ export default function SiteHeader() {
               <Link to="/#services" className="nav-link">Услуги</Link>
               <Link to="/#news" className="nav-link">Новости</Link>
               <Link to="/#contacts" className="nav-link">Контакты</Link>
+              <a
+                href="http://127.0.0.1:8000/admin/"
+                target="_blank"
+                rel="noreferrer"
+                className="nav-link nav-link-admin"
+              >
+                Админка
+              </a>
 
               <button type="button" className="login-btn" onClick={openAuth}>
                 Войти
