@@ -12,11 +12,13 @@ from .serializers import (
 class CarViewSet(viewsets.ModelViewSet):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
+    lookup_field = "slug"
 
 
 class MotorcycleViewSet(viewsets.ModelViewSet):
     queryset = Motorcycle.objects.all()
     serializer_class = MotorcycleSerializer
+    lookup_field = "slug"
 
 
 class Car_PhotoViewSet(viewsets.ModelViewSet):

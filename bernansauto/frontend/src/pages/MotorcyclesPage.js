@@ -14,13 +14,12 @@ function toNumber(value) {
 function resolveMediaUrl(url) {
   if (!url) return null;
   if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  // DRF обычно отдаёт относительный путь вида /media/...
   return `http://127.0.0.1:8000${url}`;
 }
 
-export default function CarsPage() {
-  const [cars, setCars] = useState([]);
-  const [carPhotos, setCarPhotos] = useState([]);
+export default function MotorcyclesPage() {
+  const [motos, setMotos] = useState([]);
+  const [motoPhotos, setMotoPhotos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorText, setErrorText] = useState('');
 
@@ -31,6 +30,7 @@ export default function CarsPage() {
     model: '',
     yearFrom: '',
     yearTo: '',
+    motoType: '',
     availableOnly: true,
   });
 
@@ -43,17 +43,17 @@ export default function CarsPage() {
         setLoading(true);
         setErrorText('');
 
-        const [carsRes, photosRes] = await Promise.all([
-          api.get('cars/'),
-          api.get('cars/car-photos/').catch(() => ({ data: [] })), // если фото не настроены — просто пропускаем
+        const [motosRes, photosRes] = await Promise.all([
+          api.get('cars/motorcycles/'),
+          api.get('cars/moto-photos/').catch(() => ({ data: [] })),
         ]);
 
         if (!isMounted) return;
-        setCars(Array.isArray(carsRes.data) ? carsRes.data : []);
-        setCarPhotos(Array.isArray(photosRes.data) ? photosRes.data : []);
+        setMotos(Array.isArray(motosRes.data) ? motosRes.data : []);
+        setMotoPhotos(Array.isArray(photosRes.data) ? photosRes.data : []);
       } catch (err) {
         if (!isMounted) return;
-        setErrorText('Не удалось загрузить автомобили. Проверь, что бэкенд запущен на http://127.0.0.1:8000');
+        setErrorText('Не удалось загрузить мототехнику. Проверь, что бэкенд запущен на http://127.0.0.1:8000');
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -66,69 +66,78 @@ export default function CarsPage() {
 
   const markas = useMemo(() => {
     const set = new Set();
-    for (const c of cars) {
-      if (c?.marka) set.add(c.marka);
+    for (const m of motos) {
+      if (m?.marka) set.add(m.marka);
     }
     return Array.from(set).sort((a, b) => a.localeCompare(b, 'ru'));
-  }, [cars]);
+  }, [motos]);
 
   const modelsForSelectedMarka = useMemo(() => {
     const set = new Set();
-    for (const c of cars) {
-      if (!c) continue;
-      if (draftFilters.marka && c.marka !== draftFilters.marka) continue;
-      if (c.car_model) set.add(c.car_model);
+    for (const m of motos) {
+      if (!m) continue;
+      if (draftFilters.marka && m.marka !== draftFilters.marka) continue;
+      if (m.moto_model) set.add(m.moto_model);
     }
     return Array.from(set).sort((a, b) => a.localeCompare(b, 'ru'));
-  }, [cars, draftFilters.marka]);
+  }, [motos, draftFilters.marka]);
 
   const years = useMemo(() => {
     const set = new Set();
-    for (const c of cars) {
-      if (typeof c?.year === 'number') set.add(c.year);
+    for (const m of motos) {
+      if (typeof m?.year === 'number') set.add(m.year);
     }
     return Array.from(set).sort((a, b) => b - a);
-  }, [cars]);
+  }, [motos]);
 
-  const firstPhotoByCarId = useMemo(() => {
+  const motoTypes = useMemo(() => {
+    const set = new Set();
+    for (const m of motos) {
+      if (m?.moto_type) set.add(m.moto_type);
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'ru'));
+  }, [motos]);
+
+  const firstPhotoByMotoId = useMemo(() => {
     const map = new Map();
-    for (const p of carPhotos) {
-      const carId = p?.car;
+    for (const p of motoPhotos) {
+      const motoId = p?.motorcycle;
       const url = resolveMediaUrl(p?.photo);
-      if (!carId || !url) continue;
-      if (!map.has(carId)) map.set(carId, url);
+      if (!motoId || !url) continue;
+      if (!map.has(motoId)) map.set(motoId, url);
     }
     return map;
-  }, [carPhotos]);
+  }, [motoPhotos]);
 
-  const filteredCars = useMemo(() => {
+  const filteredMotos = useMemo(() => {
     const priceFrom = toNumber(appliedFilters.priceFromUsd);
     const priceTo = toNumber(appliedFilters.priceToUsd);
     const yearFrom = toNumber(appliedFilters.yearFrom);
     const yearTo = toNumber(appliedFilters.yearTo);
 
-    return cars.filter((c) => {
-      if (!c) return false;
+    return motos.filter((m) => {
+      if (!m) return false;
 
-      if (appliedFilters.availableOnly && c.available === false) return false;
+      if (appliedFilters.availableOnly && m.available === false) return false;
 
-      if (appliedFilters.marka && c.marka !== appliedFilters.marka) return false;
-      if (appliedFilters.model && c.car_model !== appliedFilters.model) return false;
+      if (appliedFilters.marka && m.marka !== appliedFilters.marka) return false;
+      if (appliedFilters.model && m.moto_model !== appliedFilters.model) return false;
+      if (appliedFilters.motoType && m.moto_type !== appliedFilters.motoType) return false;
 
-      if (yearFrom !== null && Number(c.year) < yearFrom) return false;
-      if (yearTo !== null && Number(c.year) > yearTo) return false;
+      if (yearFrom !== null && Number(m.year) < yearFrom) return false;
+      if (yearTo !== null && Number(m.year) > yearTo) return false;
 
-      const priceUsd = c.price_usd !== null && c.price_usd !== undefined ? Number(c.price_usd) : null;
+      const priceUsd = m.price_usd !== null && m.price_usd !== undefined ? Number(m.price_usd) : null;
       if (priceFrom !== null && (priceUsd === null || priceUsd < priceFrom)) return false;
       if (priceTo !== null && (priceUsd === null || priceUsd > priceTo)) return false;
 
       return true;
     });
-  }, [cars, appliedFilters]);
+  }, [motos, appliedFilters]);
 
   const applyFilters = () => {
     setAppliedFilters(draftFilters);
-    const el = document.getElementById('cars-results');
+    const el = document.getElementById('motos-results');
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
@@ -140,6 +149,7 @@ export default function CarsPage() {
       model: '',
       yearFrom: '',
       yearTo: '',
+      motoType: '',
       availableOnly: true,
     };
     setDraftFilters(base);
@@ -153,8 +163,8 @@ export default function CarsPage() {
       <main className="catalog-main">
         <section className="catalog-hero">
           <div className="container">
-            <h2>Автомобили</h2>
-            <p>Каталог автомобилей с фильтром как на Golden Motors.</p>
+            <h2>Мототехника</h2>
+            <p>Каталог мототехники с фильтрами по цене, марке, году и типу.</p>
           </div>
         </section>
 
@@ -162,7 +172,7 @@ export default function CarsPage() {
           <div className="container breadcrumbs-inner">
             <Link to="/" className="breadcrumbs-link">Главная</Link>
             <span className="breadcrumbs-sep">/</span>
-            <span className="breadcrumbs-current">Автомобили</span>
+            <span className="breadcrumbs-current">Мототехника</span>
           </div>
         </nav>
 
@@ -186,7 +196,7 @@ export default function CarsPage() {
                     type="number"
                     value={draftFilters.priceToUsd}
                     onChange={(e) => setDraftFilters((s) => ({ ...s, priceToUsd: e.target.value }))}
-                    placeholder="100000"
+                    placeholder="50000"
                     min="0"
                   />
                 </div>
@@ -218,6 +228,18 @@ export default function CarsPage() {
                     <option value="">Любая</option>
                     {modelsForSelectedMarka.map((m) => (
                       <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="filter-field">
+                  <label>Тип</label>
+                  <select
+                    value={draftFilters.motoType}
+                    onChange={(e) => setDraftFilters((s) => ({ ...s, motoType: e.target.value }))}
+                  >
+                    <option value="">Любой</option>
+                    {motoTypes.map((t) => (
+                      <option key={t} value={t}>{t}</option>
                     ))}
                   </select>
                 </div>
@@ -256,7 +278,7 @@ export default function CarsPage() {
                   </label>
                 </div>
                 <div className="filters-actions">
-                  <button type="button" className="btn-primary" onClick={applyFilters}>Показать авто</button>
+                  <button type="button" className="btn-primary" onClick={applyFilters}>Показать мототехнику</button>
                   <button type="button" className="btn-outline" onClick={resetFilters}>Сбросить</button>
                 </div>
               </div>
@@ -264,48 +286,48 @@ export default function CarsPage() {
           </div>
         </section>
 
-        <section id="cars-results" className="catalog-results">
+        <section id="motos-results" className="catalog-results">
           <div className="container">
             <div className="results-header">
-              <h3>Найдено: {filteredCars.length}</h3>
+              <h3>Найдено: {filteredMotos.length}</h3>
               {loading && <span className="results-muted">Загрузка…</span>}
               {errorText && <span className="results-error">{errorText}</span>}
             </div>
 
             <div className="catalog-grid">
-              {!loading && filteredCars.length === 0 && (
+              {!loading && filteredMotos.length === 0 && (
                 <div className="results-empty">
                   Ничего не найдено по выбранным фильтрам.
                 </div>
               )}
 
-              {filteredCars.map((c) => {
-                const img = firstPhotoByCarId.get(c.id) || null;
+              {filteredMotos.map((m) => {
+                const img = firstPhotoByMotoId.get(m.id) || null;
                 return (
                   <Link
-                    key={c.id}
-                    to={`/cars/${encodeURIComponent(c.slug)}`}
+                    key={m.id}
+                    to={`/motorcycles/${encodeURIComponent(m.slug)}`}
                     className="catalog-card catalog-card-link"
                   >
                     <div className="catalog-card-image">
                       {img ? (
-                        <img src={img} alt={`${c.marka} ${c.car_model}`} />
+                        <img src={img} alt={`${m.marka} ${m.moto_model}`} />
                       ) : (
                         <div className="catalog-card-placeholder">Нет фото</div>
                       )}
-                      <div className="catalog-card-badge">{c.available ? 'В наличии' : 'Нет в наличии'}</div>
+                      <div className="catalog-card-badge">{m.available ? 'В наличии' : 'Нет в наличии'}</div>
                     </div>
                     <div className="catalog-card-body">
-                      <h4>{c.marka} {c.car_model}</h4>
+                      <h4>{m.marka} {m.moto_model}</h4>
                       <div className="catalog-card-meta">
-                        <span>{c.year} г.</span>
-                        <span>{Number(c.mileage || 0).toLocaleString()} км</span>
-                        {c.body_type ? <span>{c.body_type}</span> : null}
-                        {c.transmission ? <span>{c.transmission}</span> : null}
+                        <span>{m.year} г.</span>
+                        <span>{Number(m.mileage || 0).toLocaleString()} км</span>
+                        {m.moto_type ? <span>{m.moto_type}</span> : null}
+                        {m.engine_volume ? <span>{Number(m.engine_volume)} л</span> : null}
                       </div>
                       <div className="catalog-card-price">
-                        <div className="price-byn">{c.price_byn ? `${Number(c.price_byn).toLocaleString()} BYN` : '—'}</div>
-                        <div className="price-usd">{c.price_usd ? `$${Number(c.price_usd).toLocaleString()}` : ''}</div>
+                        <div className="price-byn">{m.price_byn ? `${Number(m.price_byn).toLocaleString()} BYN` : '—'}</div>
+                        <div className="price-usd">{m.price_usd ? `$${Number(m.price_usd).toLocaleString()}` : ''}</div>
                       </div>
                       <span className="btn-outline">Подробнее</span>
                     </div>
