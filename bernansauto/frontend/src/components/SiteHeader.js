@@ -32,7 +32,9 @@ export default function SiteHeader() {
               <NavLink to="/cars" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
                 Автомобили
               </NavLink>
-              <Link to="/#motorcycles" className="nav-link">Мототехника</Link>
+              <NavLink to="/motorcycles" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+                Мототехника
+              </NavLink>
               <Link to="/#services" className="nav-link">Услуги</Link>
               <Link to="/#news" className="nav-link">Новости</Link>
               <Link to="/#contacts" className="nav-link">Контакты</Link>
@@ -110,8 +112,8 @@ export default function SiteHeader() {
 
           {authTab === 'register' && (
             <form className="auth-form" onSubmit={(e) => e.preventDefault()}>
-              <label htmlFor="reg-username">Username</label>
-              <input id="reg-username" type="text" placeholder="Имя пользователя" autoComplete="username" />
+              <label htmlFor="reg-username">Имя пользователя</label>
+              <input id="reg-username" type="text" placeholder="Username" autoComplete="username" />
               <label htmlFor="reg-phone">Телефон</label>
               <input id="reg-phone" type="tel" placeholder="+375 (29) 123-45-67" autoComplete="tel" />
               <label htmlFor="reg-email">Email</label>

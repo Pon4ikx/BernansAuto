@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils.text import slugify
 
 
 class Car(models.Model):
@@ -16,6 +17,13 @@ class Car(models.Model):
         max_digits=6, decimal_places=2, null=True, blank=True, verbose_name="Объём двигателя"
     )
     color = models.CharField(max_length=50, blank=True, verbose_name="Цвет")
+    slug = models.SlugField(
+        max_length=255,
+        unique=True,
+        blank=True,
+        null=True,
+        verbose_name="URL-имя",
+    )
     
     price_byn = models.DecimalField(
         max_digits=12, decimal_places=2, null=True, blank=True, verbose_name="Цена BYN"
@@ -36,6 +44,30 @@ class Car(models.Model):
 
     def __str__(self):
         return f"{self.marka} {self.car_model} ({self.year})"
+
+    def _generate_slug(self) -> str:
+        """
+        Формируем человекочитаемый slug вида Марка-Модель-Год с заменой пробелов на дефисы.
+        Пример: BMW-X5-2023.
+        """
+        base = f"{self.marka}-{self.car_model}-{self.year}"
+        # сначала грубо заменяем пробелы на дефисы, затем даём slugify донастроить строку
+        base = base.replace(" ", "-")
+        raw = slugify(base, allow_unicode=True)
+        # подстраховка на случай пустого результата
+        if not raw:
+            raw = f"car-{self.pk or ''}"
+        slug = raw
+        n = 1
+        while Car.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+            n += 1
+            slug = f"{raw}-{n}"
+        return slug
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self._generate_slug()
+        super().save(*args, **kwargs)
 
 
 class Motorcycle(models.Model):
@@ -68,6 +100,13 @@ class Motorcycle(models.Model):
     description = models.TextField(blank=True, verbose_name="Описание")
     available = models.BooleanField(default=True, verbose_name="Доступно")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    slug = models.SlugField(
+        max_length=255,
+        unique=True,
+        blank=True,
+        null=True,
+        verbose_name="URL-имя",
+    )
 
     class Meta:
         db_table = "cars_motorcycle"
@@ -77,6 +116,27 @@ class Motorcycle(models.Model):
 
     def __str__(self):
         return f"{self.marka} {self.moto_model} ({self.year})"
+
+    def _generate_slug(self) -> str:
+        """
+        Формируем slug для мототехники: Марка-Модель-Год.
+        """
+        base = f"{self.marka}-{self.moto_model}-{self.year}"
+        base = base.replace(" ", "-")
+        raw = slugify(base, allow_unicode=True)
+        if not raw:
+            raw = f"moto-{self.pk or ''}"
+        slug = raw
+        n = 1
+        while Motorcycle.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+            n += 1
+            slug = f"{raw}-{n}"
+        return slug
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self._generate_slug()
+        super().save(*args, **kwargs)
 
 
 class Car_Photo(models.Model):

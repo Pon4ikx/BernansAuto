@@ -6,6 +6,12 @@ from .models import Car, Motorcycle, Car_Photo, Moto_Photo, Favorite
 
 
 
+class Car_PhotoInline(admin.TabularInline):
+    model = Car_Photo
+    extra = 0
+    fields = ("photo",)
+
+
 class Moto_PhotoInline(admin.TabularInline):
     model = Moto_Photo
     extra = 0
@@ -30,6 +36,7 @@ class CarAdmin(admin.ModelAdmin):
     search_fields = ("marka", "car_model", "description")
     list_editable = ("available",)
     readonly_fields = ("created_at", "updated_at")
+    inlines = [Car_PhotoInline]
     fieldsets = (
         (None, {"fields": ("marka", "car_model", "year", "mileage", "color", "description", "available")}),
         ("Двигатель и ходовая", {"fields": ("body_type", "engine_type", "engine_volume", "transmission", "drive_type")}),
