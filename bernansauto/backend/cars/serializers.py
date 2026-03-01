@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Car, Motorcycle, Car_Photo, Moto_Photo, Favorite
+from .models import Car, Motorcycle, Car_Photo, Moto_Photo, CarFavorite, MotoFavorite
 
 
 class CarSerializer(serializers.ModelSerializer):
@@ -26,7 +26,13 @@ class Moto_PhotoSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class FavoriteSerializer(serializers.ModelSerializer):
+class CarFavoriteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Favorite
+        model = CarFavorite
+        fields = "__all__"
+
+
+class MotoFavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MotoFavorite
         fields = "__all__"

@@ -1,11 +1,12 @@
 from rest_framework import viewsets
-from .models import Car, Motorcycle, Car_Photo, Moto_Photo, Favorite
+from .models import Car, Motorcycle, Car_Photo, Moto_Photo, CarFavorite, MotoFavorite
 from .serializers import (
     CarSerializer,
     MotorcycleSerializer,
     Car_PhotoSerializer,
     Moto_PhotoSerializer,
-    FavoriteSerializer,
+    CarFavoriteSerializer,
+    MotoFavoriteSerializer,
 )
 
 
@@ -31,6 +32,11 @@ class Moto_PhotoViewSet(viewsets.ModelViewSet):
     serializer_class = Moto_PhotoSerializer
 
 
-class FavoriteViewSet(viewsets.ModelViewSet):
-    queryset = Favorite.objects.all()
-    serializer_class = FavoriteSerializer
+class CarFavoriteViewSet(viewsets.ModelViewSet):
+    queryset = CarFavorite.objects.all()
+    serializer_class = CarFavoriteSerializer
+
+
+class MotoFavoriteViewSet(viewsets.ModelViewSet):
+    queryset = MotoFavorite.objects.all()
+    serializer_class = MotoFavoriteSerializer

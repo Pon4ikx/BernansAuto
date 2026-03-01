@@ -5,14 +5,16 @@ from .views import (
     MotorcycleViewSet,
     Car_PhotoViewSet,
     Moto_PhotoViewSet,
-    FavoriteViewSet,
+    CarFavoriteViewSet,
+    MotoFavoriteViewSet,
 )
 
 router = DefaultRouter()
 router.register(r"motorcycles", MotorcycleViewSet, basename="motorcycle")
 router.register(r"car-photos", Car_PhotoViewSet, basename="car_photo")
 router.register(r"moto-photos", Moto_PhotoViewSet, basename="moto_photo")
-router.register(r"favorites", FavoriteViewSet, basename="favorite")
+router.register(r"car-favorites", CarFavoriteViewSet, basename="car_favorite")
+router.register(r"moto-favorites", MotoFavoriteViewSet, basename="moto_favorite")
 router.register(r"", CarViewSet, basename="car")
 
 urlpatterns = router.urls
