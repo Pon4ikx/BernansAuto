@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.html import format_html
-from .models import Car, Motorcycle, Car_Photo, Moto_Photo, Favorite
+from .models import Car, Motorcycle, Car_Photo, Moto_Photo, CarFavorite, MotoFavorite
 
 
 
@@ -162,10 +162,19 @@ class Moto_PhotoAdmin(admin.ModelAdmin):
         return super().response_add(request, obj, post_url_continue)
 
 
-@admin.register(Favorite)
-class FavoriteAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "car", "motorcycle", "created_at")
+@admin.register(CarFavorite)
+class CarFavoriteAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "car", "created_at")
     list_filter = ("user",)
-    search_fields = ("user__username", "car__marka", "motorcycle__marka")
-    raw_id_fields = ("user", "car", "motorcycle")
+    search_fields = ("user__username", "car__marka")
+    raw_id_fields = ("user", "car")
+    readonly_fields = ("created_at",)
+
+
+@admin.register(MotoFavorite)
+class MotoFavoriteAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "motorcycle", "created_at")
+    list_filter = ("user",)
+    search_fields = ("user__username", "motorcycle__marka")
+    raw_id_fields = ("user", "motorcycle")
     readonly_fields = ("created_at",)

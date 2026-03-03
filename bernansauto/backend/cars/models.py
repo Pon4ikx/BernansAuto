@@ -173,41 +173,53 @@ class Moto_Photo(models.Model):
         return f"Фото — {self.motorcycle}"
 
 
-class Favorite(models.Model):
-    """Избранное: пользователь_id, авто_id (NULL), мототехника_id (NULL), дата_добавления."""
+class CarFavorite(models.Model):
+    """Избранные автомобили."""
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="favorites",
+        related_name="car_favorites",
         verbose_name="Пользователь",
     )
     car = models.ForeignKey(
-        Car, on_delete=models.CASCADE, null=True, blank=True, related_name="favorites", verbose_name="Автомобиль"
-    )
-    motorcycle = models.ForeignKey(
-        Motorcycle, on_delete=models.CASCADE, null=True, blank=True, related_name="favorites", verbose_name="Мототехника"
+        Car, on_delete=models.CASCADE, related_name="car_favorites", verbose_name="Автомобиль"
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
 
     class Meta:
-        db_table = "cars_favorite"
-        verbose_name = "Избранное"
-        verbose_name_plural = "Избранное"
+        db_table = "cars_car_favorite"
+        verbose_name = "Избранный автомобиль"
+        verbose_name_plural = "Избранные автомобили"
         ordering = ["-created_at"]
         constraints = [
-            models.CheckConstraint(
-                check=models.Q(car__isnull=False) | models.Q(motorcycle__isnull=False),
-                name="favorite_car_or_moto",
-            ),
-            models.UniqueConstraint(
-                fields=["user", "car"], condition=models.Q(car__isnull=False), name="unique_user_car"
-            ),
-            models.UniqueConstraint(
-                fields=["user", "motorcycle"], condition=models.Q(motorcycle__isnull=False), name="unique_user_moto"
-            ),
+            models.UniqueConstraint(fields=["user", "car"], name="unique_user_car_favorite"),
         ]
 
     def __str__(self):
-        if self.car_id:
-            return f"{self.user} — {self.car}"
+        return f"{self.user} — {self.car}"
+
+
+class MotoFavorite(models.Model):
+    """Избранная мототехника."""
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="moto_favorites",
+        verbose_name="Пользователь",
+    )
+    motorcycle = models.ForeignKey(
+        Motorcycle, on_delete=models.CASCADE, related_name="moto_favorites", verbose_name="Мототехника"
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
+
+    class Meta:
+        db_table = "cars_moto_favorite"
+        verbose_name = "Избранная мототехника"
+        verbose_name_plural = "Избранная мототехника"
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["user", "motorcycle"], name="unique_user_moto_favorite"),
+        ]
+
+    def __str__(self):
         return f"{self.user} — {self.motorcycle}"
