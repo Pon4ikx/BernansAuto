@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { api } from '../api';
+import ScrollToTopButton from './ScrollToTopButton';
 
 export default function SiteHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -8,7 +9,6 @@ export default function SiteHeader() {
   const [authTab, setAuthTab] = useState('login'); // 'login' | 'register'
   const [user, setUser] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [authMessage, setAuthMessage] = useState('');
   const [authError, setAuthError] = useState('');
   const [loginForm, setLoginForm] = useState({ login: '', password: '' });
   const [registerForm, setRegisterForm] = useState({
@@ -30,7 +30,6 @@ export default function SiteHeader() {
 
   const openAuth = () => {
     setAuthError('');
-    setAuthMessage('');
     setIsAuthPanelOpen(true);
     setAuthTab('login');
   };
@@ -38,12 +37,10 @@ export default function SiteHeader() {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setAuthError('');
-    setAuthMessage('');
     setIsSubmitting(true);
     try {
       const { data } = await api.post('accounts/login/', loginForm);
       setUser(data);
-      setAuthMessage(`Вы вошли как ${data.username}`);
       setIsAuthPanelOpen(false);
       setLoginForm({ login: '', password: '' });
     } catch (error) {
@@ -57,7 +54,6 @@ export default function SiteHeader() {
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setAuthError('');
-    setAuthMessage('');
     setIsSubmitting(true);
     try {
       const payload = {
@@ -68,7 +64,6 @@ export default function SiteHeader() {
       };
       const { data } = await api.post('accounts/register/', payload);
       setUser(data);
-      setAuthMessage(`Регистрация успешна. Вы вошли как ${data.username}`);
       setIsAuthPanelOpen(false);
       setRegisterForm({ username: '', phone: '', email: '', password: '' });
     } catch (error) {
@@ -79,19 +74,6 @@ export default function SiteHeader() {
       setAuthError(firstFieldError || 'Не удалось зарегистрироваться.');
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    setAuthError('');
-    setAuthMessage('');
-    try {
-      await api.post('accounts/logout/');
-    } catch (error) {
-      // Even if request fails, clear local state.
-    } finally {
-      setUser(null);
-      setAuthMessage('Вы вышли из аккаунта.');
     }
   };
 
@@ -110,9 +92,6 @@ export default function SiteHeader() {
             </div>
 
             <nav className={`nav ${isMenuOpen ? 'nav-open' : ''}`}>
-              <NavLink to="/" end className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-                Главная
-              </NavLink>
               <NavLink to="/cars" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
                 Автомобили
               </NavLink>
@@ -124,7 +103,7 @@ export default function SiteHeader() {
               <Link to="/#contacts" className="nav-link">Контакты</Link>
               {user?.is_staff && (
                 <a
-                  href="http://127.0.0.1:8000/admin/"
+                  href="http://localhost:8000/admin/"
                   target="_blank"
                   rel="noreferrer"
                   className="nav-link nav-link-admin"
@@ -134,12 +113,9 @@ export default function SiteHeader() {
               )}
 
               {user ? (
-                <>
-                  <span className="nav-link">Привет, {user.username}</span>
-                  <button type="button" className="login-btn" onClick={handleLogout}>
-                    Выйти
-                  </button>
-                </>
+                <Link to="/profile" className="login-btn">
+                  Личный кабинет
+                </Link>
               ) : (
                 <button type="button" className="login-btn" onClick={openAuth}>
                   Войти
@@ -159,13 +135,6 @@ export default function SiteHeader() {
           </div>
         </div>
       </header>
-      {(authMessage || authError) && (
-        <div className="container" style={{ marginTop: '78px' }}>
-          <div className="auth-feedback" style={{ color: authError ? '#b00020' : '#147a8f' }}>
-            {authError || authMessage}
-          </div>
-        </div>
-      )}
 
       {/* Оверлей и панель входа/регистрации (выезжает справа по кнопке «Войти») */}
       <div
@@ -282,6 +251,7 @@ export default function SiteHeader() {
           )}
         </div>
       </div>
+      <ScrollToTopButton />
     </>
   );
 }

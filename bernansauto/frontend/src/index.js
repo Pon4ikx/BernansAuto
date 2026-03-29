@@ -6,6 +6,7 @@ import CarsPage from './pages/CarsPage';
 import MotorcyclesPage from './pages/MotorcyclesPage';
 import CarDetailPage from './pages/CarDetailPage';
 import MotorcycleDetailPage from './pages/MotorcycleDetailPage';
+import ProfilePage from './pages/ProfilePage';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -17,6 +18,7 @@ root.render(
         <Route path="/cars/:slug" element={<CarDetailPage />} />
         <Route path="/motorcycles" element={<MotorcyclesPage />} />
         <Route path="/motorcycles/:slug" element={<MotorcycleDetailPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
