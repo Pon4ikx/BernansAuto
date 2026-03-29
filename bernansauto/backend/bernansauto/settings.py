@@ -52,7 +52,7 @@ ROOT_URLCONF = 'bernansauto.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -151,3 +151,5 @@ MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware'] + MIDDLEWARE
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
+
+CORS_ALLOW_CREDENTIALS = True
