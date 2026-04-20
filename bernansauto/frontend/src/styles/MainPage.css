@@ -47,7 +47,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 0;
+    padding: 1.15rem 0;
 }
 
 .logo-link {
@@ -133,6 +133,31 @@ body {
     transition: background 0.2s, color 0.2s;
 }
 
+.login-btn-account {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    min-width: 180px;
+    line-height: 1.1;
+    text-align: center;
+    padding: 0.45rem 1.25rem;
+}
+
+.login-btn-account-name {
+    max-width: 170px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.login-btn-account-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    opacity: 0.85;
+}
+
 .login-btn:hover {
     background: #fff;
     color: var(--color-primary-dark) !important;
@@ -160,7 +185,7 @@ body {
     height: 75vh;
     min-height: 420px;
     overflow: hidden;
-    margin-top: 72px;
+    margin-top: 82px;
 }
 
 .slide {
@@ -640,7 +665,7 @@ body {
 @media (max-width: 768px) {
     .nav {
         position: fixed;
-        top: 70px;
+        top: 80px;
         left: 0;
         width: 100%;
         background: var(--color-primary-dark);

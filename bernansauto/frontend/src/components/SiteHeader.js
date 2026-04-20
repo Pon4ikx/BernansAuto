@@ -113,8 +113,9 @@ export default function SiteHeader() {
               )}
 
               {user ? (
-                <Link to="/profile" className="login-btn">
-                  Личный кабинет
+                <Link to="/profile" className="login-btn login-btn-account">
+                  <span className="login-btn-account-name">{user.username || 'Пользователь'}</span>
+                  <span className="login-btn-account-label">Аккаунт</span>
                 </Link>
               ) : (
                 <button type="button" className="login-btn" onClick={openAuth}>
