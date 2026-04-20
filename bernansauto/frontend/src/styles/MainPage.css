@@ -866,6 +866,31 @@ body {
     border-color: var(--color-primary);
 }
 
+.password-input-wrap {
+    position: relative;
+}
+
+.password-input-wrap input {
+    padding-right: 92px;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: var(--color-primary-dark);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.password-toggle-btn:hover {
+    color: var(--color-primary);
+}
+
 .auth-form .btn-primary {
     margin-top: 0.5rem;
     padding: 12px 24px;

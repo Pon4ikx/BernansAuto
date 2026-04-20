@@ -308,7 +308,7 @@ const MainPage = () => {
                         <div className="footer-section">
                             <h4>Контакты</h4>
                             <p>📞 +375 (XX) XXX-XX-XX</p>
-                            <p>📧 info@bernansauto.by</p>
+                            <p>📧 bernansauto@gmail.com</p>
                             <p>📍 г. Минск, ул. Примерная, 123</p>
                         </div>
                         <div className="footer-section">

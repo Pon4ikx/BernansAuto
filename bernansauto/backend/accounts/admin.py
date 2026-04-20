@@ -1,11 +1,13 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
+from django.conf import settings
 from .models import User
 
 # Register your models here.
 admin.site.site_header = "BernansAuto"  # Заголовок панели администратора
 admin.site.site_title = "Администрирование BernansAuto"  # Заголовок на вкладке браузера
 admin.site.index_title = "Администрирование"  # Текст на главной странице админки
+admin.site.site_url = settings.FRONTEND_BASE_URL
 
 
 @admin.register(User)
