@@ -2,13 +2,15 @@ from django.contrib.auth import authenticate, login as django_login, logout as d
 from django.core import signing
 from django.core.mail import send_mail
 from django.conf import settings
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import User
-from .serializers import RegisterSerializer, UserSerializer
+from .serializers import AccountSettingsSerializer, RegisterSerializer, UserSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -103,10 +105,36 @@ class LogoutView(APIView):
 
 
 class MeView(APIView):
-    def get(self, request):
+    def _get_authenticated_user(self, request):
         if not request.user.is_authenticated:
+            return None
+        return request.user
+
+    @method_decorator(ensure_csrf_cookie)
+    def get(self, request):
+        user = self._get_authenticated_user(request)
+        if not user:
             return Response({"detail": "Не авторизован."}, status=status.HTTP_401_UNAUTHORIZED)
-        return Response(UserSerializer(request.user).data)
+        return Response(UserSerializer(user).data)
+
+    def patch(self, request):
+        user = self._get_authenticated_user(request)
+        if not user:
+            return Response({"detail": "Не авторизован."}, status=status.HTTP_401_UNAUTHORIZED)
+
+        serializer = AccountSettingsSerializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(UserSerializer(user).data)
+
+    def delete(self, request):
+        user = self._get_authenticated_user(request)
+        if not user:
+            return Response({"detail": "Не авторизован."}, status=status.HTTP_401_UNAUTHORIZED)
+
+        django_logout(request)
+        user.delete()
+        return Response({"detail": "Аккаунт удален."}, status=status.HTTP_200_OK)
 
 
 class VerifyEmailView(APIView):

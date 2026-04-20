@@ -17,7 +17,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 
-# Application definition
+# Application definition 
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -154,6 +154,9 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+]
 
 # Email settings for registration verification (temporary hardcoded setup).
 # WARNING: for production move credentials to environment variables.
