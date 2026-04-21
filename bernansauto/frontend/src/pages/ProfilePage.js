@@ -4,6 +4,12 @@ import SiteHeader from '../components/SiteHeader';
 import { api } from '../api';
 import '../styles/ProfilePage.css';
 
+function resolveMediaUrl(url) {
+  if (!url) return null;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  return `http://127.0.0.1:8000${url}`;
+}
+
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,6 +22,12 @@ export default function ProfilePage() {
   const [deleteModalError, setDeleteModalError] = useState('');
   const [settingsError, setSettingsError] = useState('');
   const [settingsSuccess, setSettingsSuccess] = useState('');
+  const [favoriteCars, setFavoriteCars] = useState([]);
+  const [favoriteMotos, setFavoriteMotos] = useState([]);
+  const [favoriteCarsById, setFavoriteCarsById] = useState({});
+  const [favoriteMotosById, setFavoriteMotosById] = useState({});
+  const [favoriteViewMode, setFavoriteViewMode] = useState('grid');
+  const [favoritesLoading, setFavoritesLoading] = useState(false);
   const [settingsForm, setSettingsForm] = useState({
     username: '',
     email: '',
@@ -56,6 +68,62 @@ export default function ProfilePage() {
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) {
+      setFavoriteCars([]);
+      setFavoriteMotos([]);
+      return;
+    }
+
+    let isMounted = true;
+    const loadFavorites = async () => {
+      setFavoritesLoading(true);
+      try {
+        const [carFavRes, motoFavRes, carsRes, motosRes, carPhotosRes, motoPhotosRes] = await Promise.all([
+          api.get('cars/car-favorites/').catch(() => ({ data: [] })),
+          api.get('cars/moto-favorites/').catch(() => ({ data: [] })),
+          api.get('cars/').catch(() => ({ data: [] })),
+          api.get('cars/motorcycles/').catch(() => ({ data: [] })),
+          api.get('cars/car-photos/').catch(() => ({ data: [] })),
+          api.get('cars/moto-photos/').catch(() => ({ data: [] })),
+        ]);
+
+        if (!isMounted) return;
+        const cars = Array.isArray(carsRes.data) ? carsRes.data : [];
+        const motos = Array.isArray(motosRes.data) ? motosRes.data : [];
+
+        const favoriteCarIds = new Set((Array.isArray(carFavRes.data) ? carFavRes.data : []).map((x) => x.car));
+        const favoriteMotoIds = new Set((Array.isArray(motoFavRes.data) ? motoFavRes.data : []).map((x) => x.motorcycle));
+
+        setFavoriteCars(cars.filter((c) => favoriteCarIds.has(c.id)));
+        setFavoriteMotos(motos.filter((m) => favoriteMotoIds.has(m.id)));
+
+        const carPhotoMap = {};
+        for (const photo of (Array.isArray(carPhotosRes.data) ? carPhotosRes.data : [])) {
+          if (!photo?.car || carPhotoMap[photo.car]) continue;
+          const resolved = resolveMediaUrl(photo.photo);
+          if (resolved) carPhotoMap[photo.car] = resolved;
+        }
+        setFavoriteCarsById(carPhotoMap);
+
+        const motoPhotoMap = {};
+        for (const photo of (Array.isArray(motoPhotosRes.data) ? motoPhotosRes.data : [])) {
+          if (!photo?.motorcycle || motoPhotoMap[photo.motorcycle]) continue;
+          const resolved = resolveMediaUrl(photo.photo);
+          if (resolved) motoPhotoMap[photo.motorcycle] = resolved;
+        }
+        setFavoriteMotosById(motoPhotoMap);
+      } finally {
+        if (isMounted) setFavoritesLoading(false);
+      }
+    };
+
+    loadFavorites();
+    return () => {
+      isMounted = false;
+    };
+  }, [user?.id]);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -138,6 +206,20 @@ export default function ProfilePage() {
   const renderTabContent = () => {
     if (!user) return null;
 
+    const removeFavoriteCar = async (event, carId) => {
+      event.preventDefault();
+      event.stopPropagation();
+      await api.post('cars/favorites/car/toggle/', { car_id: carId });
+      setFavoriteCars((prev) => prev.filter((item) => item.id !== carId));
+    };
+
+    const removeFavoriteMoto = async (event, motoId) => {
+      event.preventDefault();
+      event.stopPropagation();
+      await api.post('cars/favorites/moto/toggle/', { motorcycle_id: motoId });
+      setFavoriteMotos((prev) => prev.filter((item) => item.id !== motoId));
+    };
+
     if (activeTab === 'applications') {
       return (
         <div className="profile-panel-card">
@@ -147,11 +229,73 @@ export default function ProfilePage() {
       );
     }
 
+    const renderFavoriteControls = () => (
+      <div className="profile-favorites-controls">
+        <button
+          type="button"
+          className={`profile-view-btn ${favoriteViewMode === 'grid' ? 'active' : ''}`}
+          onClick={() => setFavoriteViewMode('grid')}
+          aria-label="Сетка"
+          title="Показать сеткой"
+        >
+          ⠿
+        </button>
+        <button
+          type="button"
+          className={`profile-view-btn ${favoriteViewMode === 'list' ? 'active' : ''}`}
+          onClick={() => setFavoriteViewMode('list')}
+          aria-label="Список"
+          title="Показать списком"
+        >
+          ☰
+        </button>
+      </div>
+    );
+
     if (activeTab === 'favCars') {
       return (
         <div className="profile-panel-card">
           <h2>Избранные автомобили</h2>
-          <p className="profile-panel-muted">Пока здесь пусто. В будущем здесь появятся сохраненные автомобили.</p>
+          {renderFavoriteControls()}
+          {favoritesLoading && <p className="profile-panel-muted">Загрузка избранных автомобилей...</p>}
+          {!favoritesLoading && favoriteCars.length === 0 && (
+            <p className="profile-panel-muted">Пока нет избранных автомобилей.</p>
+          )}
+          {!favoritesLoading && favoriteCars.length > 0 && (
+            <div className={`profile-favorites-list ${favoriteViewMode === 'grid' ? 'grid-mode' : 'list-mode'}`}>
+              {favoriteCars.map((car) => (
+                <Link key={car.id} to={`/cars/${encodeURIComponent(car.slug)}`} className="profile-favorite-item">
+                  <button
+                    type="button"
+                    className="profile-favorite-remove-btn"
+                    onClick={(e) => removeFavoriteCar(e, car.id)}
+                    aria-label="Убрать из избранного"
+                    title="Убрать из избранного"
+                  >
+                    ✕
+                  </button>
+                  <div className="profile-favorite-thumb">
+                    {favoriteCarsById[car.id] ? (
+                      <img src={favoriteCarsById[car.id]} alt={`${car.marka} ${car.car_model}`} />
+                    ) : (
+                      <span>Нет фото</span>
+                    )}
+                  </div>
+                  <div className="profile-favorite-text">
+                    <div className="profile-favorite-title">{car.marka} {car.car_model}</div>
+                    <div className="profile-favorite-meta">
+                      {car.year} г. • {car.price_byn ? `${Number(car.price_byn).toLocaleString()} BYN` : 'Цена по запросу'}
+                    </div>
+                    <div className="profile-favorite-meta">
+                      {Number(car.mileage || 0).toLocaleString()} км
+                      {car.body_type ? ` • ${car.body_type}` : ''}
+                      {car.transmission ? ` • ${car.transmission}` : ''}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       );
     }
@@ -160,7 +304,46 @@ export default function ProfilePage() {
       return (
         <div className="profile-panel-card">
           <h2>Избранные мотоциклы</h2>
-          <p className="profile-panel-muted">Пока здесь пусто. В будущем здесь появятся сохраненные мотоциклы.</p>
+          {renderFavoriteControls()}
+          {favoritesLoading && <p className="profile-panel-muted">Загрузка избранной мототехники...</p>}
+          {!favoritesLoading && favoriteMotos.length === 0 && (
+            <p className="profile-panel-muted">Пока нет избранной мототехники.</p>
+          )}
+          {!favoritesLoading && favoriteMotos.length > 0 && (
+            <div className={`profile-favorites-list ${favoriteViewMode === 'grid' ? 'grid-mode' : 'list-mode'}`}>
+              {favoriteMotos.map((moto) => (
+                <Link key={moto.id} to={`/motorcycles/${encodeURIComponent(moto.slug)}`} className="profile-favorite-item">
+                  <button
+                    type="button"
+                    className="profile-favorite-remove-btn"
+                    onClick={(e) => removeFavoriteMoto(e, moto.id)}
+                    aria-label="Убрать из избранного"
+                    title="Убрать из избранного"
+                  >
+                    ✕
+                  </button>
+                  <div className="profile-favorite-thumb">
+                    {favoriteMotosById[moto.id] ? (
+                      <img src={favoriteMotosById[moto.id]} alt={`${moto.marka} ${moto.moto_model}`} />
+                    ) : (
+                      <span>Нет фото</span>
+                    )}
+                  </div>
+                  <div className="profile-favorite-text">
+                    <div className="profile-favorite-title">{moto.marka} {moto.moto_model}</div>
+                    <div className="profile-favorite-meta">
+                      {moto.year} г. • {moto.price_byn ? `${Number(moto.price_byn).toLocaleString()} BYN` : 'Цена по запросу'}
+                    </div>
+                    <div className="profile-favorite-meta">
+                      {Number(moto.mileage || 0).toLocaleString()} км
+                      {moto.moto_type ? ` • ${moto.moto_type}` : ''}
+                      {moto.engine_volume ? ` • ${Number(moto.engine_volume)} л` : ''}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       );
     }

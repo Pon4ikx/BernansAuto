@@ -20,6 +20,8 @@ function resolveMediaUrl(url) {
 export default function MotorcyclesPage() {
   const [motos, setMotos] = useState([]);
   const [motoPhotos, setMotoPhotos] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [favoriteMotoIds, setFavoriteMotoIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorText, setErrorText] = useState('');
 
@@ -43,14 +45,19 @@ export default function MotorcyclesPage() {
         setLoading(true);
         setErrorText('');
 
-        const [motosRes, photosRes] = await Promise.all([
+        const [motosRes, photosRes, meRes, favoritesRes] = await Promise.all([
           api.get('cars/motorcycles/'),
           api.get('cars/moto-photos/').catch(() => ({ data: [] })),
+          api.get('accounts/me/').catch(() => null),
+          api.get('cars/moto-favorites/').catch(() => ({ data: [] })),
         ]);
 
         if (!isMounted) return;
         setMotos(Array.isArray(motosRes.data) ? motosRes.data : []);
         setMotoPhotos(Array.isArray(photosRes.data) ? photosRes.data : []);
+        setIsAuthenticated(Boolean(meRes?.data?.id));
+        const ids = Array.isArray(favoritesRes.data) ? favoritesRes.data.map((item) => item.motorcycle) : [];
+        setFavoriteMotoIds(ids);
       } catch (err) {
         if (!isMounted) return;
         setErrorText('Не удалось загрузить мототехнику. Проверь, что бэкенд запущен на http://127.0.0.1:8000');
@@ -154,6 +161,35 @@ export default function MotorcyclesPage() {
     };
     setDraftFilters(base);
     setAppliedFilters(base);
+  };
+
+  const openAuthPanel = () => {
+    window.dispatchEvent(new CustomEvent('open-auth-panel', { detail: { tab: 'login' } }));
+  };
+
+  const toggleFavorite = async (event, motorcycleId) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!isAuthenticated) {
+      openAuthPanel();
+      return;
+    }
+
+    try {
+      const { data } = await api.post('cars/favorites/moto/toggle/', { motorcycle_id: motorcycleId });
+      setFavoriteMotoIds((prev) => {
+        const has = prev.includes(motorcycleId);
+        if (data?.is_favorite && !has) return [...prev, motorcycleId];
+        if (!data?.is_favorite && has) return prev.filter((id) => id !== motorcycleId);
+        return prev;
+      });
+    } catch (error) {
+      if (error?.response?.status === 401) {
+        setIsAuthenticated(false);
+        openAuthPanel();
+      }
+    }
   };
 
   return (
@@ -303,6 +339,7 @@ export default function MotorcyclesPage() {
 
               {filteredMotos.map((m) => {
                 const img = firstPhotoByMotoId.get(m.id) || null;
+                const isFavorite = favoriteMotoIds.includes(m.id);
                 return (
                   <Link
                     key={m.id}
@@ -310,6 +347,14 @@ export default function MotorcyclesPage() {
                     className="catalog-card catalog-card-link"
                   >
                     <div className="catalog-card-image">
+                      <button
+                        type="button"
+                        className={`favorite-toggle-btn ${isFavorite ? 'active' : ''}`}
+                        onClick={(e) => toggleFavorite(e, m.id)}
+                        aria-label={isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}
+                      >
+                        {isFavorite ? '★' : '☆'}
+                      </button>
                       {img ? (
                         <img src={img} alt={`${m.marka} ${m.moto_model}`} />
                       ) : (

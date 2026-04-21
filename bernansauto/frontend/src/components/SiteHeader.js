@@ -56,6 +56,17 @@ export default function SiteHeader() {
     setAuthTab('login');
   };
 
+  useEffect(() => {
+    const handleOpenAuthPanel = (event) => {
+      const tab = event?.detail?.tab;
+      setAuthError('');
+      setIsAuthPanelOpen(true);
+      setAuthTab(tab === 'register' ? 'register' : 'login');
+    };
+    window.addEventListener('open-auth-panel', handleOpenAuthPanel);
+    return () => window.removeEventListener('open-auth-panel', handleOpenAuthPanel);
+  }, []);
+
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setAuthError('');
@@ -234,6 +245,13 @@ export default function SiteHeader() {
                 </button>
               </div>
               {authError && <div className="auth-hint" style={{ color: '#b00020' }}>{authError}</div>}
+              <button
+                type="button"
+                className="auth-link-btn"
+                onClick={() => navigate('/forgot-password')}
+              >
+                Забыли пароль?
+              </button>
               <button type="submit" className="btn-primary" disabled={isSubmitting}>
                 {isSubmitting ? 'Вход...' : 'Войти'}
               </button>

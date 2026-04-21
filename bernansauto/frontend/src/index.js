@@ -8,6 +8,7 @@ import CarDetailPage from './pages/CarDetailPage';
 import MotorcycleDetailPage from './pages/MotorcycleDetailPage';
 import ProfilePage from './pages/ProfilePage';
 import EmailVerificationPage from './pages/EmailVerificationPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -21,6 +22,7 @@ root.render(
         <Route path="/motorcycles/:slug" element={<MotorcycleDetailPage />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/verify-email" element={<EmailVerificationPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

@@ -15,6 +15,8 @@ export default function CarDetailPage() {
   const { slug } = useParams();
   const [car, setCar] = useState(null);
   const [photos, setPhotos] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
   const [errorText, setErrorText] = useState('');
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
@@ -36,6 +38,17 @@ export default function CarDetailPage() {
         const all = Array.isArray(photosRes.data) ? photosRes.data.filter((p) => p.car === carId) : [];
         setPhotos(all);
         setActivePhotoIndex(0);
+
+        const meRes = await api.get('accounts/me/').catch(() => null);
+        const isAuth = Boolean(meRes?.data?.id);
+        setIsAuthenticated(isAuth);
+        if (isAuth) {
+          const favoritesRes = await api.get('cars/car-favorites/').catch(() => ({ data: [] }));
+          const ids = Array.isArray(favoritesRes.data) ? favoritesRes.data.map((item) => item.car) : [];
+          setIsFavorite(ids.includes(carId));
+        } else {
+          setIsFavorite(false);
+        }
       } catch (err) {
         if (!isMounted) return;
         setErrorText('Не удалось загрузить автомобиль. Возможно, он был удалён или изменён slug.');
@@ -48,6 +61,27 @@ export default function CarDetailPage() {
       isMounted = false;
     };
   }, [slug]);
+
+  const openAuthPanel = () => {
+    window.dispatchEvent(new CustomEvent('open-auth-panel', { detail: { tab: 'login' } }));
+  };
+
+  const toggleFavorite = async () => {
+    if (!car) return;
+    if (!isAuthenticated) {
+      openAuthPanel();
+      return;
+    }
+    try {
+      const { data } = await api.post('cars/favorites/car/toggle/', { car_id: car.id });
+      setIsFavorite(Boolean(data?.is_favorite));
+    } catch (error) {
+      if (error?.response?.status === 401) {
+        setIsAuthenticated(false);
+        openAuthPanel();
+      }
+    }
+  };
 
   return (
     <div className="cars-page">
@@ -72,7 +106,7 @@ export default function CarDetailPage() {
           </div>
         </nav>
 
-        <section className="catalog-results">
+        <section className="catalog-results catalog-results-detail">
           <div className="container">
             {loading && <div className="results-muted">Загрузка…</div>}
             {errorText && <div className="results-error">{errorText}</div>}
@@ -193,7 +227,15 @@ export default function CarDetailPage() {
 
                     <div className="car-detail-actions">
                       <button type="button" className="btn-primary">Оставить заявку</button>
-                      <button type="button" className="btn-outline">Уточнить наличие</button>
+                      <button
+                        type="button"
+                        className={`btn-outline detail-favorite-btn ${isFavorite ? 'active' : ''}`}
+                        onClick={toggleFavorite}
+                      >
+                        <span className="detail-favorite-icon">{isFavorite ? '★' : '☆'}</span>
+                        <span className="detail-favorite-label">{isFavorite ? 'В избранном' : 'В избранное'}</span>
+                      </button>
+                      <button type="button" className="btn-outline detail-secondary-btn">Уточнить наличие</button>
                     </div>
                   </div>
                 </div>

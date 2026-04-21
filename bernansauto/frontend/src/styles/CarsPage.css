@@ -108,6 +108,10 @@
 
 .filter-field-checkbox {
   grid-column: span 3;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 10px;
+  justify-content: flex-start;
 }
 
 .filter-field-checkbox label {
@@ -115,6 +119,16 @@
   align-items: center;
   gap: 0.5rem;
   user-select: none;
+  margin-top: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-left: -26px;
+}
+
+.filter-field-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
 }
 
 .filters-actions {
@@ -126,6 +140,10 @@
 
 .catalog-results {
   padding: 0 0 4rem;
+}
+
+.catalog-results-detail {
+  padding-top: 1rem;
 }
 
 .results-header {
@@ -191,6 +209,37 @@
   position: relative;
   height: 200px;
   background: var(--color-bg-light);
+}
+
+.favorite-toggle-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+  color: #506269;
+  font-size: 1.1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: all 0.2s ease;
+}
+
+.favorite-toggle-btn:hover {
+  transform: scale(1.05);
+  color: #f08f16;
+}
+
+.favorite-toggle-btn.active {
+  color: #f6b01a;
+  border-color: #f3c96b;
+  background: #fff8df;
 }
 
 .catalog-card-image img {
@@ -395,6 +444,46 @@
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-bottom: 1.75rem;
+}
+
+.car-detail-actions .btn-primary,
+.car-detail-actions .detail-favorite-btn,
+.car-detail-actions .detail-secondary-btn {
+  min-width: 220px;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detail-favorite-btn.active {
+  color: #9a6a00;
+  border-color: #f0bb55;
+  background: #fff2d4;
+}
+
+.detail-favorite-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.detail-favorite-icon {
+  width: 1em;
+  display: inline-block;
+  text-align: center;
+}
+
+.detail-favorite-label {
+  min-width: 108px;
+  text-align: left;
+}
+
+.detail-secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .car-detail-description h4 {
