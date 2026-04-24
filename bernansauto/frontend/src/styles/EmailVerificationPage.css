@@ -31,3 +31,38 @@
 .email-verification-actions {
   margin-top: 18px;
 }
+
+.simple-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 18, 20, 0.48);
+  display: grid;
+  place-items: center;
+  z-index: 2200;
+  padding: 16px;
+}
+
+.simple-modal {
+  width: 100%;
+  max-width: 520px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.22);
+}
+
+.simple-modal h3 {
+  color: var(--color-primary);
+  margin-bottom: 8px;
+}
+
+.simple-modal p {
+  color: #3a5056;
+  margin-bottom: 14px;
+}
+
+.simple-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+}

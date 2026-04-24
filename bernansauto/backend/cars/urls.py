@@ -9,6 +9,8 @@ from .views import (
     MotoFavoriteViewSet,
     CarFavoriteToggleView,
     MotoFavoriteToggleView,
+    PopularCarsView,
+    PopularMotorcyclesView,
 )
 
 router = DefaultRouter()
@@ -21,6 +23,8 @@ router.register(r"", CarViewSet, basename="car")
 
 urlpatterns = router.urls
 urlpatterns += [
+    path("popular/cars/", PopularCarsView.as_view(), name="popular-cars"),
+    path("popular/motorcycles/", PopularMotorcyclesView.as_view(), name="popular-motorcycles"),
     path("favorites/car/toggle/", CarFavoriteToggleView.as_view(), name="car-favorite-toggle"),
     path("favorites/moto/toggle/", MotoFavoriteToggleView.as_view(), name="moto-favorite-toggle"),
 ]

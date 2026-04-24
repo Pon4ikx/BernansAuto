@@ -141,7 +141,7 @@ export default function SiteHeader() {
               </NavLink>
               <Link to="/#services" className="nav-link">Услуги</Link>
               <Link to="/#news" className="nav-link">Новости</Link>
-              <Link to="/#contacts" className="nav-link">Контакты</Link>
+              <Link to="/contacts" className="nav-link">Контакты</Link>
               {user?.is_staff && (
                 <a
                   href="http://localhost:8000/admin/"

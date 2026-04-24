@@ -9,6 +9,8 @@ import MotorcycleDetailPage from './pages/MotorcycleDetailPage';
 import ProfilePage from './pages/ProfilePage';
 import EmailVerificationPage from './pages/EmailVerificationPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import ContactsPage from './pages/ContactsPage';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -23,6 +25,8 @@ root.render(
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/verify-email" element={<EmailVerificationPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/contacts" element={<ContactsPage />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

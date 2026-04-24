@@ -1,3 +1,4 @@
+from django.db.models import Count
 from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -5,7 +6,9 @@ from rest_framework.views import APIView
 from .models import Car, Motorcycle, Car_Photo, Moto_Photo, CarFavorite, MotoFavorite
 from .serializers import (
     CarSerializer,
+  PopularCarSerializer,
     MotorcycleSerializer,
+  PopularMotorcycleSerializer,
     Car_PhotoSerializer,
     Moto_PhotoSerializer,
     CarFavoriteSerializer,
@@ -97,3 +100,25 @@ class MotoFavoriteToggleView(APIView):
 
         MotoFavorite.objects.create(user=request.user, motorcycle=motorcycle)
         return Response({"is_favorite": True}, status=status.HTTP_200_OK)
+
+
+class PopularCarsView(APIView):
+    def get(self, request):
+        qs = (
+            Car.objects.filter(available=True)
+            .annotate(favorite_count=Count("car_favorites"))
+            .order_by("-favorite_count", "-created_at")
+        )
+        top = qs[:3]
+        return Response(PopularCarSerializer(top, many=True).data)
+
+
+class PopularMotorcyclesView(APIView):
+    def get(self, request):
+        qs = (
+            Motorcycle.objects.filter(available=True)
+            .annotate(favorite_count=Count("moto_favorites"))
+            .order_by("-favorite_count", "-created_at")
+        )
+        top = qs[:3]
+        return Response(PopularMotorcycleSerializer(top, many=True).data)
