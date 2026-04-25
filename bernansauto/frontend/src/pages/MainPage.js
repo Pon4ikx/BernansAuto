@@ -289,6 +289,9 @@ const MainPage = () => {
                             </div>
                         ))}
                     </div>
+                    <div className="section-footer">
+                        <Link to="/services" className="btn-primary">Все услуги</Link>
+                    </div>
                 </div>
             </section>
 
@@ -302,6 +305,9 @@ const MainPage = () => {
                             <h3>Скоро здесь будут новости</h3>
                             <p>На этом блоке будем показывать последние публикации/обновления из бэкенда.</p>
                         </div>
+                    </div>
+                    <div className="section-footer">
+                        <Link to="/news" className="btn-primary">Все новости</Link>
                     </div>
                 </div>
             </section>

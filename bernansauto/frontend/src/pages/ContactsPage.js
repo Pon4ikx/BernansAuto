@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import SiteHeader from '../components/SiteHeader';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { api } from '../api';
 import '../styles/ContactsPage.css';
 
@@ -36,6 +37,13 @@ export default function ContactsPage() {
     <div className="contacts-page">
       <SiteHeader />
       <main className="contacts-main">
+        <Breadcrumbs
+          lead
+          items={[
+            { to: '/', label: 'Главная' },
+            { label: 'Контакты' },
+          ]}
+        />
         <div className="container">
           <div className="contacts-hero">
             <h1>Контакты</h1>

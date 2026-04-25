@@ -185,7 +185,10 @@ body {
     height: 75vh;
     min-height: 420px;
     overflow: hidden;
-    margin-top: 82px;
+    /* padding вместо margin — иначе между шапкой и слайдером видна полоска фона .main-page / body */
+    margin-top: 0;
+    padding-top: var(--site-header-offset);
+    background-color: var(--color-primary-dark);
 }
 
 .slide {

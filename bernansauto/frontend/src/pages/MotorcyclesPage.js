@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../api';
 import '../styles/MainPage.css';
 import '../styles/CarsPage.css';
+import '../styles/Breadcrumbs.css';
 import SiteHeader from '../components/SiteHeader';
 
 function toNumber(value) {

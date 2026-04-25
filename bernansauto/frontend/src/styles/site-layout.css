@@ -1,0 +1,8 @@
+/* Подключается из index.js до остальных стилей. */
+:root {
+  /*
+   * Отступ под фиксированный .header: вертикальные padding .header-content (1.15rem×2)
+   * + ряд контента (лого 60px или блок навигации/кнопки) + запас под box-shadow.
+   */
+  --site-header-offset: max(7.25rem, calc(2.3rem + 60px + 20px));
+}

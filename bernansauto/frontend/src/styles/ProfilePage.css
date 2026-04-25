@@ -4,8 +4,10 @@
 }
 
 .profile-main {
-  padding-top: 118px;
+  padding-top: var(--site-header-offset);
   padding-bottom: 48px;
+  /* тот же фон, что у .profile-page — без отдельного «бэнда» и градиента у .container */
+  background-color: var(--color-bg-light);
 }
 
 .profile-layout {
@@ -399,10 +401,6 @@
 }
 
 @media (max-width: 640px) {
-  .profile-main {
-    padding-top: 106px;
-  }
-
   .profile-hero-inner {
     flex-direction: column;
     align-items: flex-start;

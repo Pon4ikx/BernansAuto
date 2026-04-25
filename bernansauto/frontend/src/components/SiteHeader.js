@@ -139,8 +139,12 @@ export default function SiteHeader() {
               <NavLink to="/motorcycles" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
                 Мототехника
               </NavLink>
-              <Link to="/#services" className="nav-link">Услуги</Link>
-              <Link to="/#news" className="nav-link">Новости</Link>
+              <NavLink to="/services" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+                Услуги
+              </NavLink>
+              <NavLink to="/news" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+                Новости
+              </NavLink>
               <Link to="/contacts" className="nav-link">Контакты</Link>
               {user?.is_staff && (
                 <a
