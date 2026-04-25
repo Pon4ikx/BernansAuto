@@ -8,6 +8,13 @@ class CarSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class PopularCarSerializer(CarSerializer):
+    favorite_count = serializers.IntegerField(read_only=True)
+
+    class Meta(CarSerializer.Meta):
+        fields = "__all__"
+
+
 class Car_PhotoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Car_Photo
@@ -17,6 +24,13 @@ class Car_PhotoSerializer(serializers.ModelSerializer):
 class MotorcycleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Motorcycle
+        fields = "__all__"
+
+
+class PopularMotorcycleSerializer(MotorcycleSerializer):
+    favorite_count = serializers.IntegerField(read_only=True)
+
+    class Meta(MotorcycleSerializer.Meta):
         fields = "__all__"
 
 

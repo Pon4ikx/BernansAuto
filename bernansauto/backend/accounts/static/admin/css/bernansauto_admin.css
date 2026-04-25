@@ -1,0 +1,251 @@
+:root {
+    --bernans-bg-light: #F1F1F2;
+    --bernans-border: #BCBABE;
+    --bernans-accent: #A1D6E2;
+    --bernans-primary: #1995AD;
+    --bernans-primary-dark: #147a8f;
+    --selected-row: rgba(161, 214, 226, 0.28);
+}
+
+html[data-theme="light"],
+html,
+body,
+#nav-sidebar {
+    --selected-row: rgba(161, 214, 226, 0.28) !important;
+}
+
+html,
+body {
+    color-scheme: light;
+}
+
+.theme-toggle,
+.theme-switch {
+    display: none !important;
+}
+
+/* Base colors */
+body {
+    background: var(--bernans-bg-light);
+    color: #333;
+}
+
+#header {
+    background: var(--bernans-primary-dark);
+    color: #fff;
+}
+
+#header a:link,
+#header a:visited {
+    color: #fff;
+}
+
+#header a:hover,
+#header a:focus {
+    color: var(--bernans-accent);
+}
+
+#branding h1,
+#branding h1 a:link,
+#branding h1 a:visited {
+    color: #fff;
+}
+
+div.breadcrumbs {
+    background: var(--bernans-primary);
+    color: #fff;
+}
+
+div.breadcrumbs a {
+    color: #fff;
+}
+
+div.breadcrumbs a:hover {
+    color: var(--bernans-accent);
+}
+
+/* Main modules and cards */
+.module,
+#content-related .module,
+.inline-group {
+    border: 1px solid var(--bernans-border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.module h2,
+.module caption,
+.inline-group h2 {
+    background: var(--bernans-primary);
+    color: #fff;
+}
+
+/* Links and actions */
+a:link,
+a:visited {
+    color: var(--bernans-primary);
+}
+
+a:hover,
+a:focus {
+    color: var(--bernans-primary-dark);
+}
+
+.button,
+input[type="submit"],
+input[type="button"],
+.submit-row input,
+a.button {
+    background: var(--bernans-primary);
+    border: 1px solid var(--bernans-primary);
+    color: #fff;
+    border-radius: 6px;
+}
+
+.button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+.submit-row input:hover,
+a.button:hover {
+    background: var(--bernans-primary-dark);
+    border-color: var(--bernans-primary-dark);
+    color: #fff;
+}
+
+.button.default,
+input[type="submit"].default,
+.submit-row input.default {
+    background: var(--bernans-primary-dark);
+    border-color: var(--bernans-primary-dark);
+}
+
+.button.default:hover,
+input[type="submit"].default:hover,
+.submit-row input.default:hover {
+    background: var(--bernans-primary);
+    border-color: var(--bernans-primary);
+}
+
+/* Forms and tables */
+input,
+textarea,
+select,
+.vTextField {
+    border: 1px solid var(--bernans-border);
+    border-radius: 6px;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+.vTextField:focus {
+    border-color: var(--bernans-primary);
+    box-shadow: 0 0 0 1px rgba(25, 149, 173, 0.2);
+}
+
+#changelist table thead th,
+#changelist table tfoot td {
+    background: var(--bernans-bg-light);
+}
+
+#changelist table tbody tr:nth-child(even) {
+    background: #fafafa;
+}
+
+#changelist table tbody tr:nth-child(odd) {
+    background: #fff;
+}
+
+#changelist-filter h2 {
+    background: var(--bernans-primary);
+    color: #fff;
+}
+
+#changelist-filter {
+    border-left: 1px solid var(--bernans-border);
+    background: #fff;
+}
+
+/* Messages */
+ul.messagelist li.success {
+    background: rgba(161, 214, 226, 0.45);
+}
+
+ul.messagelist li.warning {
+    background: rgba(188, 186, 190, 0.4);
+}
+
+ul.messagelist li.error {
+    background: rgba(199, 83, 83, 0.2);
+}
+
+/* Remove default yellow-ish admin rows in app index modules */
+.app-index .module table,
+#content-main .module table {
+    background: #fff;
+}
+
+.app-index .module table th,
+.app-index .module table td,
+#content-main .module table th,
+#content-main .module table td {
+    background: transparent;
+}
+
+.app-index .module table tr,
+#content-main .module table tr {
+    background: #fff;
+}
+
+.app-index .module table tr:nth-child(even),
+#content-main .module table tr:nth-child(even) {
+    background: var(--bernans-bg-light);
+}
+
+.app-index .module table tr:hover,
+#content-main .module table tr:hover {
+    background: rgba(161, 214, 226, 0.22);
+}
+
+/* Force override of Django selected/current row (yellow by default) */
+.app-index .module table tr.current-model,
+#content-main .module table tr.current-model,
+.app-index .module table tr.current-model th,
+.app-index .module table tr.current-model td,
+#content-main .module table tr.current-model th,
+#content-main .module table tr.current-model td {
+    background: rgba(161, 214, 226, 0.28) !important;
+}
+
+.app-index .module table tr.current-model a,
+#content-main .module table tr.current-model a {
+    color: var(--bernans-primary) !important;
+}
+
+/* Django changelist page uses .change-list + .app-<app> classes */
+body.change-list #content-main .app-accounts tr.current-model,
+body.change-list #content-main .app-cars tr.current-model,
+body.change-list #content-main .app-content tr.current-model,
+body.change-list #content-main .app-evaluations tr.current-model,
+body.change-list #content-main .app-services tr.current-model,
+body.change-list #content-main tr.current-model {
+    background: rgba(161, 214, 226, 0.28) !important;
+}
+
+body.change-list #content-main tr.current-model th,
+body.change-list #content-main tr.current-model td,
+body.change-list #content-main tr.current-model th a,
+body.change-list #content-main tr.current-model td a {
+    background: transparent !important;
+    color: var(--bernans-primary) !important;
+}
+
+/* Sidebar current model row (nav_sidebar.css uses --selected-row) */
+#nav-sidebar .current-model {
+    background: var(--selected-row) !important;
+}
+
+#nav-sidebar .current-model a {
+    color: var(--bernans-primary) !important;
+    font-weight: 600;
+}

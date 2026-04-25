@@ -1,0 +1,157 @@
+BernensAuto — 5 функций: кратко, что делает, затем фрагмент кода из проекта.
+
+================================================================================
+1) LoginView.post — вход в аккаунт (сессия Django)
+Файл: backend/accounts/views.py
+
+Что делает: принимает login и password из тела запроса, проверяет непустоту,
+блокирует вход для неактивных пользователей (email не подтверждён), подбирает
+username для authenticate, при успехе логинит и возвращает JSON пользователя.
+
+```python
+    def post(self, request):
+        login_value = (request.data.get('login') or '').strip()
+        password = request.data.get('password') or ''
+
+        if not login_value or not password:
+            return Response(
+                {"detail": "Введите логин/email и пароль."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user_obj = User.objects.filter(email__iexact=login_value).first()
+        if user_obj and not user_obj.is_active:
+            return Response(
+                {"detail": "Подтвердите email перед входом в аккаунт."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user_by_username = User.objects.filter(username=login_value).first()
+        if user_by_username and not user_by_username.is_active:
+            return Response(
+                {"detail": "Подтвердите email перед входом в аккаунт."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        username = user_obj.username if user_obj else login_value
+        user = authenticate(request, username=username, password=password)
+
+        if user is None:
+            return Response({"detail": "Неверный логин или пароль."}, status=status.HTTP_400_BAD_REQUEST)
+
+        django_login(request, user)
+        return Response(UserSerializer(user).data)
+```
+
+================================================================================
+2) CarFavoriteToggleView.post — переключение «избранного» для автомобиля
+Файл: backend/cars/views.py
+
+Что делает: по car_id находит авто и запись избранного текущего пользователя;
+если избранное есть — удаляет и отдаёт is_favorite: false, иначе создаёт запись
+и отдаёт is_favorite: true.
+
+```python
+    def post(self, request):
+        car_id = request.data.get("car_id")
+        if not car_id:
+            return Response({"detail": "car_id обязателен."}, status=status.HTTP_400_BAD_REQUEST)
+
+        car = Car.objects.filter(id=car_id).first()
+        if not car:
+            return Response({"detail": "Автомобиль не найден."}, status=status.HTTP_404_NOT_FOUND)
+
+        favorite = CarFavorite.objects.filter(user=request.user, car=car).first()
+        if favorite:
+            favorite.delete()
+            return Response({"is_favorite": False}, status=status.HTTP_200_OK)
+
+        CarFavorite.objects.create(user=request.user, car=car)
+        return Response({"is_favorite": True}, status=status.HTTP_200_OK)
+```
+
+================================================================================
+3) PopularCarsView.get — топ-3 популярных автомобилей
+Файл: backend/cars/views.py
+
+Что делает: среди доступных авто считает количество избранных, сортирует по
+убыванию популярности и дате, сериализует первые три записи для главной страницы.
+
+```python
+    def get(self, request):
+        qs = (
+            Car.objects.filter(available=True)
+            .annotate(favorite_count=Count("car_favorites"))
+            .order_by("-favorite_count", "-created_at")
+        )
+        top = qs[:3]
+        return Response(PopularCarSerializer(top, many=True).data)
+```
+
+================================================================================
+4) VerifyEmailView.post — подтверждение email по токену из письма
+Файл: backend/accounts/views.py
+
+Что делает: проверяет подписанный токен (срок — сутки), находит пользователя,
+если ещё не активен — выставляет is_active=True и сохраняет.
+
+```python
+    def post(self, request):
+        token = (request.data.get('token') or '').strip()
+        if not token:
+            return Response({"detail": "Токен подтверждения не передан."}, status=status.HTTP_400_BAD_REQUEST)
+
+        signer = signing.TimestampSigner(salt='accounts.email_verification')
+        try:
+            user_id = signer.unsign(token, max_age=60 * 60 * 24)
+        except signing.SignatureExpired:
+            return Response({"detail": "Ссылка подтверждения истекла."}, status=status.HTTP_400_BAD_REQUEST)
+        except signing.BadSignature:
+            return Response({"detail": "Некорректная ссылка подтверждения."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.filter(id=user_id).first()
+        if not user:
+            return Response({"detail": "Пользователь не найден."}, status=status.HTTP_404_NOT_FOUND)
+
+        if user.is_active:
+            return Response({"detail": "Email уже подтвержден."}, status=status.HTTP_200_OK)
+
+        user.is_active = True
+        user.save(update_fields=['is_active'])
+        return Response({"detail": "Email успешно подтвержден. Теперь вы можете войти."}, status=status.HTTP_200_OK)
+```
+
+================================================================================
+5) useMemo(filteredCars) — клиентская фильтрация каталога автомобилей
+Файл: frontend/src/pages/CarsPage.js
+
+Что делает: по состоянию cars и appliedFilters отбирает машины по наличию,
+марке, модели, году и диапазону цены USD; пересчитывается при смене данных
+или применённых фильтров.
+
+```javascript
+  const filteredCars = useMemo(() => {
+    const priceFrom = toNumber(appliedFilters.priceFromUsd);
+    const priceTo = toNumber(appliedFilters.priceToUsd);
+    const yearFrom = toNumber(appliedFilters.yearFrom);
+    const yearTo = toNumber(appliedFilters.yearTo);
+
+    return cars.filter((c) => {
+      if (!c) return false;
+
+      if (appliedFilters.availableOnly && c.available === false) return false;
+
+      if (appliedFilters.marka && c.marka !== appliedFilters.marka) return false;
+      if (appliedFilters.model && c.car_model !== appliedFilters.model) return false;
+
+      if (yearFrom !== null && Number(c.year) < yearFrom) return false;
+      if (yearTo !== null && Number(c.year) > yearTo) return false;
+
+      const priceUsd = c.price_usd !== null && c.price_usd !== undefined ? Number(c.price_usd) : null;
+      if (priceFrom !== null && (priceUsd === null || priceUsd < priceFrom)) return false;
+      if (priceTo !== null && (priceUsd === null || priceUsd > priceTo)) return false;
+
+      return true;
+    });
+  }, [cars, appliedFilters]);
+```

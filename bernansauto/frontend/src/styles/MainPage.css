@@ -47,7 +47,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 0;
+    padding: 1.15rem 0;
 }
 
 .logo-link {
@@ -133,6 +133,31 @@ body {
     transition: background 0.2s, color 0.2s;
 }
 
+.login-btn-account {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.1rem;
+    min-width: 180px;
+    line-height: 1.1;
+    text-align: center;
+    padding: 0.45rem 1.25rem;
+}
+
+.login-btn-account-name {
+    max-width: 170px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.login-btn-account-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    opacity: 0.85;
+}
+
 .login-btn:hover {
     background: #fff;
     color: var(--color-primary-dark) !important;
@@ -160,7 +185,10 @@ body {
     height: 75vh;
     min-height: 420px;
     overflow: hidden;
-    margin-top: 72px;
+    /* padding вместо margin — иначе между шапкой и слайдером видна полоска фона .main-page / body */
+    margin-top: 0;
+    padding-top: var(--site-header-offset);
+    background-color: var(--color-primary-dark);
 }
 
 .slide {
@@ -640,7 +668,7 @@ body {
 @media (max-width: 768px) {
     .nav {
         position: fixed;
-        top: 70px;
+        top: 80px;
         left: 0;
         width: 100%;
         background: var(--color-primary-dark);
@@ -841,6 +869,31 @@ body {
     border-color: var(--color-primary);
 }
 
+.password-input-wrap {
+    position: relative;
+}
+
+.password-input-wrap input {
+    padding-right: 92px;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: var(--color-primary-dark);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.password-toggle-btn:hover {
+    color: var(--color-primary);
+}
+
 .auth-form .btn-primary {
     margin-top: 0.5rem;
     padding: 12px 24px;
@@ -850,4 +903,20 @@ body {
     font-size: 0.9rem;
     color: #666;
     margin-top: -0.5rem;
+}
+
+.auth-link-btn {
+    border: none;
+    background: transparent;
+    color: var(--color-primary);
+    text-align: left;
+    padding: 0;
+    margin-top: -0.4rem;
+    cursor: pointer;
+    font-size: 0.92rem;
+}
+
+.auth-link-btn:hover {
+    color: var(--color-primary-dark);
+    text-decoration: underline;
 }

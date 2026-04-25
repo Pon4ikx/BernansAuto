@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import SiteHeader from '../components/SiteHeader';
+import { api } from '../api';
 import '../styles/MainPage.css';
 
 const MainPage = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [currencyRate, setCurrencyRate] = useState(2.5); // Пример курса BYN/USD
+    const [popularCars, setPopularCars] = useState([]);
+    const [popularMotos, setPopularMotos] = useState([]);
+    const [carPhotos, setCarPhotos] = useState([]);
+    const [motoPhotos, setMotoPhotos] = useState([]);
     const location = useLocation();
 
     // Данные для слайдера
@@ -27,46 +32,11 @@ const MainPage = () => {
         }
     ];
 
-    // Популярные автомобили
-    const featuredCars = [
-        {
-            id: 1,
-            image: 'https://via.placeholder.com/300x200.png?text=Car+1',
-            brand: 'BMW',
-            model: 'X5',
-            year: 2023,
-            price: 85000,
-            mileage: 15000,
-            bodyType: 'SUV'
-        },
-        {
-            id: 2,
-            image: 'https://via.placeholder.com/300x200.png?text=Car+2',
-            brand: 'Mercedes',
-            model: 'E-Class',
-            year: 2022,
-            price: 65000,
-            mileage: 20000,
-            bodyType: 'Sedan'
-        },
-        {
-            id: 3,
-            image: 'https://via.placeholder.com/300x200.png?text=Car+3',
-            brand: 'Audi',
-            model: 'Q7',
-            year: 2023,
-            price: 78000,
-            mileage: 10000,
-            bodyType: 'SUV'
-        }
-    ];
-
-    // Популярная мототехника (как блок «Подбор мототехники» на Golden Motors)
-    const featuredMotos = [
-        { id: 1, image: 'https://via.placeholder.com/300x200.png?text=Moto+1', brand: 'Honda', model: 'CMX', year: 2023, mileage: 5500, price: 8800 },
-        { id: 2, image: 'https://via.placeholder.com/300x200.png?text=Moto+2', brand: 'Suzuki', model: 'Boulevard C50', year: 2008, mileage: 13000, price: 5950 },
-        { id: 3, image: 'https://via.placeholder.com/300x200.png?text=Moto+3', brand: 'Harley-Davidson', model: 'Road Glide', year: 2019, mileage: 53600, price: 16950 }
-    ];
+    const resolveMediaUrl = (url) => {
+        if (!url) return null;
+        if (url.startsWith('http://') || url.startsWith('https://')) return url;
+        return `http://127.0.0.1:8000${url}`;
+    };
 
     // Услуги
     const services = [
@@ -82,6 +52,51 @@ const MainPage = () => {
         }, 5000);
         return () => clearInterval(interval);
     }, [slides.length]);
+
+    useEffect(() => {
+        let isMounted = true;
+        const loadPopular = async () => {
+            try {
+                const [carsRes, motosRes, carPhotosRes, motoPhotosRes] = await Promise.all([
+                    api.get('cars/popular/cars/').catch(() => ({ data: [] })),
+                    api.get('cars/popular/motorcycles/').catch(() => ({ data: [] })),
+                    api.get('cars/car-photos/').catch(() => ({ data: [] })),
+                    api.get('cars/moto-photos/').catch(() => ({ data: [] })),
+                ]);
+                if (!isMounted) return;
+                setPopularCars(Array.isArray(carsRes.data) ? carsRes.data : []);
+                setPopularMotos(Array.isArray(motosRes.data) ? motosRes.data : []);
+                setCarPhotos(Array.isArray(carPhotosRes.data) ? carPhotosRes.data : []);
+                setMotoPhotos(Array.isArray(motoPhotosRes.data) ? motoPhotosRes.data : []);
+            } catch (e) {
+                // silently ignore; page will just show empty blocks
+            }
+        };
+        loadPopular();
+        return () => { isMounted = false; };
+    }, []);
+
+    const firstCarPhotoById = useMemo(() => {
+        const map = new Map();
+        for (const p of carPhotos) {
+            const carId = p?.car;
+            const url = resolveMediaUrl(p?.photo);
+            if (!carId || !url) continue;
+            if (!map.has(carId)) map.set(carId, url);
+        }
+        return map;
+    }, [carPhotos]);
+
+    const firstMotoPhotoById = useMemo(() => {
+        const map = new Map();
+        for (const p of motoPhotos) {
+            const motoId = p?.motorcycle;
+            const url = resolveMediaUrl(p?.photo);
+            if (!motoId || !url) continue;
+            if (!map.has(motoId)) map.set(motoId, url);
+        }
+        return map;
+    }, [motoPhotos]);
 
     // Если перешли на главную по ссылке вида "/#services" — аккуратно скроллим к секции.
     useEffect(() => {
@@ -187,26 +202,30 @@ const MainPage = () => {
                 <div className="container">
                     <h2>Популярные автомобили</h2>
                     <div className="cars-grid">
-                        {featuredCars.map(car => {
-                            const price = formatPrice(car.price);
+                        {popularCars.map((car) => {
+                            const img = firstCarPhotoById.get(car.id);
                             return (
                                 <div key={car.id} className="car-card">
                                     <div className="car-image">
-                                        <img src={car.image} alt={`${car.brand} ${car.model}`} />
-                                        <div className="car-badge">В наличии</div>
+                                        {img ? (
+                                            <img src={img} alt={`${car.marka} ${car.car_model}`} />
+                                        ) : (
+                                            <div className="catalog-card-placeholder">Нет фото</div>
+                                        )}
+                                        <div className="car-badge">{car.available ? 'В наличии' : 'Нет в наличии'}</div>
                                     </div>
                                     <div className="car-info">
-                                        <h3>{car.brand} {car.model}</h3>
+                                        <h3>{car.marka} {car.car_model}</h3>
                                         <div className="car-details">
                                             <span>{car.year} год</span>
-                                            <span>{car.mileage.toLocaleString()} км</span>
-                                            <span>{car.bodyType}</span>
+                                            <span>{Number(car.mileage || 0).toLocaleString()} км</span>
+                                            <span>{car.body_type || '—'}</span>
                                         </div>
                                         <div className="car-price">
-                                            <div className="price-byn">{price.byn}</div>
-                                            <div className="price-usd">{price.usd}</div>
+                                            <div className="price-byn">{car.price_byn ? `${Number(car.price_byn).toLocaleString()} BYN` : '—'}</div>
+                                            <div className="price-usd">{car.price_usd ? `$${Number(car.price_usd).toLocaleString()}` : ''}</div>
                                         </div>
-                                        <button className="btn-outline">Подробнее</button>
+                                        <Link to={`/cars/${encodeURIComponent(car.slug)}`} className="btn-outline">Подробнее</Link>
                                     </div>
                                 </div>
                             );
@@ -223,25 +242,29 @@ const MainPage = () => {
                 <div className="container">
                     <h2>Подбор мототехники</h2>
                     <div className="motos-grid">
-                        {featuredMotos.map(moto => {
-                            const price = formatPrice(moto.price);
+                        {popularMotos.map((moto) => {
+                            const img = firstMotoPhotoById.get(moto.id);
                             return (
                                 <div key={moto.id} className="moto-card">
                                     <div className="moto-image">
-                                        <img src={moto.image} alt={`${moto.brand} ${moto.model}`} />
-                                        <div className="moto-badge">В наличии</div>
+                                        {img ? (
+                                            <img src={img} alt={`${moto.marka} ${moto.moto_model}`} />
+                                        ) : (
+                                            <div className="catalog-card-placeholder">Нет фото</div>
+                                        )}
+                                        <div className="moto-badge">{moto.available ? 'В наличии' : 'Нет в наличии'}</div>
                                     </div>
                                     <div className="moto-info">
-                                        <h3>{moto.brand} {moto.model}</h3>
+                                        <h3>{moto.marka} {moto.moto_model}</h3>
                                         <div className="moto-details">
                                             <span>{moto.year} г.</span>
-                                            <span>{moto.mileage.toLocaleString()} км</span>
+                                            <span>{Number(moto.mileage || 0).toLocaleString()} км</span>
                                         </div>
                                         <div className="moto-price">
-                                            <div className="price-byn">{price.byn}</div>
-                                            <div className="price-usd">{price.usd}</div>
+                                            <div className="price-byn">{moto.price_byn ? `${Number(moto.price_byn).toLocaleString()} BYN` : '—'}</div>
+                                            <div className="price-usd">{moto.price_usd ? `$${Number(moto.price_usd).toLocaleString()}` : ''}</div>
                                         </div>
-                                        <button className="btn-outline">Подробнее</button>
+                                        <Link to={`/motorcycles/${encodeURIComponent(moto.slug)}`} className="btn-outline">Подробнее</Link>
                                     </div>
                                 </div>
                             );
@@ -266,6 +289,9 @@ const MainPage = () => {
                             </div>
                         ))}
                     </div>
+                    <div className="section-footer">
+                        <Link to="/services" className="btn-primary">Все услуги</Link>
+                    </div>
                 </div>
             </section>
 
@@ -279,6 +305,9 @@ const MainPage = () => {
                             <h3>Скоро здесь будут новости</h3>
                             <p>На этом блоке будем показывать последние публикации/обновления из бэкенда.</p>
                         </div>
+                    </div>
+                    <div className="section-footer">
+                        <Link to="/news" className="btn-primary">Все новости</Link>
                     </div>
                 </div>
             </section>
@@ -308,7 +337,7 @@ const MainPage = () => {
                         <div className="footer-section">
                             <h4>Контакты</h4>
                             <p>📞 +375 (XX) XXX-XX-XX</p>
-                            <p>📧 info@bernansauto.by</p>
+                            <p>📧 bernansauto@gmail.com</p>
                             <p>📍 г. Минск, ул. Примерная, 123</p>
                         </div>
                         <div className="footer-section">

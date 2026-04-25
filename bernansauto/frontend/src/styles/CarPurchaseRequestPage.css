@@ -1,0 +1,109 @@
+.car-request-page {
+  min-height: 100vh;
+  background: var(--color-bg-light);
+}
+
+.car-request-main {
+  padding-top: 0;
+  padding-bottom: 48px;
+}
+
+.car-request-hero {
+  background: linear-gradient(135deg, rgba(25, 149, 173, 0.14), rgba(20, 122, 143, 0.12));
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: calc(var(--site-header-offset) + 22px) 24px 22px;
+  box-shadow: 0 8px 22px rgba(20, 122, 143, 0.12);
+  margin-bottom: 1.25rem;
+}
+
+.car-request-hero h1 {
+  color: var(--color-primary);
+  margin-bottom: 8px;
+}
+
+.car-request-hero p {
+  color: #3a5056;
+  max-width: 70ch;
+}
+
+.car-request-form {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  padding: 22px 24px;
+  box-shadow: 0 8px 22px rgba(20, 122, 143, 0.10);
+}
+
+.car-request-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem 1.25rem;
+}
+
+.car-request-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #23424a;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.car-request-label-full {
+  grid-column: 1 / -1;
+}
+
+.car-request-input,
+.car-request-textarea {
+  font: inherit;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(188, 186, 190, 0.85);
+  background: #fbfefe;
+  color: #20383f;
+}
+
+.car-request-input:focus,
+.car-request-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(25, 149, 173, 0.2);
+}
+
+.car-request-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.car-request-notice {
+  margin-top: 1rem;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f4fafb;
+  border: 1px solid rgba(25, 149, 173, 0.35);
+  color: #23424a;
+  line-height: 1.45;
+}
+
+.car-request-actions {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.car-request-submit {
+  min-width: 200px;
+}
+
+.car-request-link {
+  color: var(--color-primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.car-request-link:hover {
+  text-decoration: underline;
+}

@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { api } from '../api';
 import '../styles/MainPage.css';
 import '../styles/CarsPage.css';
+import '../styles/Breadcrumbs.css';
 import SiteHeader from '../components/SiteHeader';
 
 function resolveMediaUrl(url) {
@@ -15,6 +16,8 @@ export default function MotorcycleDetailPage() {
   const { slug } = useParams();
   const [moto, setMoto] = useState(null);
   const [photos, setPhotos] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(true);
   const [errorText, setErrorText] = useState('');
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
@@ -36,6 +39,17 @@ export default function MotorcycleDetailPage() {
         const all = Array.isArray(photosRes.data) ? photosRes.data.filter((p) => p.motorcycle === motoId) : [];
         setPhotos(all);
         setActivePhotoIndex(0);
+
+        const meRes = await api.get('accounts/me/').catch(() => null);
+        const isAuth = Boolean(meRes?.data?.id);
+        setIsAuthenticated(isAuth);
+        if (isAuth) {
+          const favoritesRes = await api.get('cars/moto-favorites/').catch(() => ({ data: [] }));
+          const ids = Array.isArray(favoritesRes.data) ? favoritesRes.data.map((item) => item.motorcycle) : [];
+          setIsFavorite(ids.includes(motoId));
+        } else {
+          setIsFavorite(false);
+        }
       } catch (err) {
         if (!isMounted) return;
         setErrorText('Не удалось загрузить мототехнику. Возможно, она была удалена или изменён slug.');
@@ -48,6 +62,27 @@ export default function MotorcycleDetailPage() {
       isMounted = false;
     };
   }, [slug]);
+
+  const openAuthPanel = () => {
+    window.dispatchEvent(new CustomEvent('open-auth-panel', { detail: { tab: 'login' } }));
+  };
+
+  const toggleFavorite = async () => {
+    if (!moto) return;
+    if (!isAuthenticated) {
+      openAuthPanel();
+      return;
+    }
+    try {
+      const { data } = await api.post('cars/favorites/moto/toggle/', { motorcycle_id: moto.id });
+      setIsFavorite(Boolean(data?.is_favorite));
+    } catch (error) {
+      if (error?.response?.status === 401) {
+        setIsAuthenticated(false);
+        openAuthPanel();
+      }
+    }
+  };
 
   return (
     <div className="cars-page">
@@ -72,7 +107,7 @@ export default function MotorcycleDetailPage() {
           </div>
         </nav>
 
-        <section className="catalog-results">
+        <section className="catalog-results catalog-results-detail">
           <div className="container">
             {loading && <div className="results-muted">Загрузка…</div>}
             {errorText && <div className="results-error">{errorText}</div>}
@@ -181,7 +216,15 @@ export default function MotorcycleDetailPage() {
 
                     <div className="car-detail-actions">
                       <button type="button" className="btn-primary">Оставить заявку</button>
-                      <button type="button" className="btn-outline">Уточнить наличие</button>
+                      <button
+                        type="button"
+                        className={`btn-outline detail-favorite-btn ${isFavorite ? 'active' : ''}`}
+                        onClick={toggleFavorite}
+                      >
+                        <span className="detail-favorite-icon">{isFavorite ? '★' : '☆'}</span>
+                        <span className="detail-favorite-label">{isFavorite ? 'В избранном' : 'В избранное'}</span>
+                      </button>
+                      <button type="button" className="btn-outline detail-secondary-btn">Уточнить наличие</button>
                     </div>
                   </div>
                 </div>

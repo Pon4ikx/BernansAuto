@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api } from '../api';
 import '../styles/MainPage.css';
 import '../styles/CarsPage.css';
+import '../styles/Breadcrumbs.css';
 import SiteHeader from '../components/SiteHeader';
 
 function toNumber(value) {
@@ -21,6 +22,8 @@ function resolveMediaUrl(url) {
 export default function CarsPage() {
   const [cars, setCars] = useState([]);
   const [carPhotos, setCarPhotos] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [favoriteCarIds, setFavoriteCarIds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorText, setErrorText] = useState('');
 
@@ -43,14 +46,19 @@ export default function CarsPage() {
         setLoading(true);
         setErrorText('');
 
-        const [carsRes, photosRes] = await Promise.all([
+        const [carsRes, photosRes, meRes, favoritesRes] = await Promise.all([
           api.get('cars/'),
           api.get('cars/car-photos/').catch(() => ({ data: [] })), // если фото не настроены — просто пропускаем
+          api.get('accounts/me/').catch(() => null),
+          api.get('cars/car-favorites/').catch(() => ({ data: [] })),
         ]);
 
         if (!isMounted) return;
         setCars(Array.isArray(carsRes.data) ? carsRes.data : []);
         setCarPhotos(Array.isArray(photosRes.data) ? photosRes.data : []);
+        setIsAuthenticated(Boolean(meRes?.data?.id));
+        const ids = Array.isArray(favoritesRes.data) ? favoritesRes.data.map((item) => item.car) : [];
+        setFavoriteCarIds(ids);
       } catch (err) {
         if (!isMounted) return;
         setErrorText('Не удалось загрузить автомобили. Проверь, что бэкенд запущен на http://127.0.0.1:8000');
@@ -144,6 +152,35 @@ export default function CarsPage() {
     };
     setDraftFilters(base);
     setAppliedFilters(base);
+  };
+
+  const openAuthPanel = () => {
+    window.dispatchEvent(new CustomEvent('open-auth-panel', { detail: { tab: 'login' } }));
+  };
+
+  const toggleFavorite = async (event, carId) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!isAuthenticated) {
+      openAuthPanel();
+      return;
+    }
+
+    try {
+      const { data } = await api.post('cars/favorites/car/toggle/', { car_id: carId });
+      setFavoriteCarIds((prev) => {
+        const has = prev.includes(carId);
+        if (data?.is_favorite && !has) return [...prev, carId];
+        if (!data?.is_favorite && has) return prev.filter((id) => id !== carId);
+        return prev;
+      });
+    } catch (error) {
+      if (error?.response?.status === 401) {
+        setIsAuthenticated(false);
+        openAuthPanel();
+      }
+    }
   };
 
   return (
@@ -281,6 +318,7 @@ export default function CarsPage() {
 
               {filteredCars.map((c) => {
                 const img = firstPhotoByCarId.get(c.id) || null;
+                const isFavorite = favoriteCarIds.includes(c.id);
                 return (
                   <Link
                     key={c.id}
@@ -288,6 +326,14 @@ export default function CarsPage() {
                     className="catalog-card catalog-card-link"
                   >
                     <div className="catalog-card-image">
+                      <button
+                        type="button"
+                        className={`favorite-toggle-btn ${isFavorite ? 'active' : ''}`}
+                        onClick={(e) => toggleFavorite(e, c.id)}
+                        aria-label={isFavorite ? 'Убрать из избранного' : 'Добавить в избранное'}
+                      >
+                        {isFavorite ? '★' : '☆'}
+                      </button>
                       {img ? (
                         <img src={img} alt={`${c.marka} ${c.car_model}`} />
                       ) : (

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bernans Auto — прототип (каркас)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Montserrat', Arial, sans-serif;
+      background: #fff;
+      color: #111;
+      line-height: 1.45;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 16px; }
+    .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #555;
+      margin-bottom: 6px;
+    }
+    .box {
+      border: 2px solid #111;
+      background: #f5f5f5;
+      padding: 12px;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    header { margin-bottom: 12px; }
+    .header-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .nav-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .slider {
+      min-height: 180px;
+      margin-bottom: 12px;
+    }
+    .main {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 12px;
+    }
+    .left-stack { display: flex; flex-direction: column; gap: 12px; }
+    .ready { min-height: 220px; }
+    .info { min-height: 140px; }
+    .right-stack { display: flex; flex-direction: column; gap: 12px; }
+    .news { min-height: 200px; }
+    .pages { min-height: 160px; }
+    @media (max-width: 700px) {
+      .main { grid-template-columns: 1fr; }
+      .nav-row { grid-template-columns: repeat(2, 1fr); }
+      .header-row { grid-template-columns: 1fr; }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="header-row">
+        <div>
+          <div class="label">Шапка</div>
+          <div class="box">Логотип</div>
+        </div>
+        <div>
+          <div class="label">Шапка</div>
+          <div class="box">Контактные данные</div>
+        </div>
+      </div>
+      <div class="label">Навигация</div>
+      <div class="nav-row">
+        <div class="box">Пункт 1</div>
+        <div class="box">Пункт 2</div>
+        <div class="box">Пункт 3</div>
+        <div class="box">Пункт 4</div>
+      </div>
+    </header>
+
+    <section>
+      <div class="label">Герой-блок</div>
+      <div class="box slider">Слайдер</div>
+    </section>
+
+    <main class="main">
+      <div class="left-stack">
+        <section>
+          <div class="label">Основная колонка</div>
+          <div class="box ready">Готовые сборки<br /><span style="font-weight:400;font-size:12px;">(в проекте Bernans Auto — популярные авто / мото)</span></div>
+        </section>
+        <section>
+          <div class="label">Основная колонка</div>
+          <div class="box info">Информация о веб-приложении</div>
+        </section>
+      </div>
+      <aside class="right-stack">
+        <section>
+          <div class="label">Боковая колонка</div>
+          <div class="box news">Новости</div>
+        </section>
+        <section>
+          <div class="label">Боковая колонка</div>
+          <div class="box pages">Страницы приложения</div>
+        </section>
+      </aside>
+    </main>
+
+    <footer style="margin-top:20px;">
+      <div class="label">Подвал (в финале — меню, «О нас», «Справка»)</div>
+      <div class="box" style="min-height:72px;">Подвал сайта</div>
+    </footer>
+  </div>
+</body>
+</html>
